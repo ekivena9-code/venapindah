@@ -1061,11 +1061,12 @@ export const Packages: React.FC<PackagesProps> = ({
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto sm:max-w-full sm:justify-end">
                     <button
                         type="button"
                         onClick={() => setIsBookingLinksModalOpen(true)}
-                        className="px-3 py-1.5 rounded-lg bg-[#5D87FF]/10 text-[#5D87FF] text-xs font-semibold hover:bg-[#5D87FF]/20 transition-all flex items-center gap-1.5"
+                        title="Kelola tautan booking publik"
+                        className="min-h-[44px] shrink-0 whitespace-nowrap px-3 py-2 rounded-xl bg-[#5D87FF]/10 text-[#5D87FF] text-xs font-semibold hover:bg-[#5D87FF]/20 transition-all flex items-center justify-center gap-1.5"
                     >
                         <LinkIcon className="w-3.5 h-3.5" />
                         Tautan Booking Publik
@@ -1073,7 +1074,7 @@ export const Packages: React.FC<PackagesProps> = ({
                     <button
                         type="button"
                         onClick={() => setIsGuideModalOpen(true)}
-                        className="py-2 sm:py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
+                        className="shrink-0 whitespace-nowrap py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
                         title="Lihat Panduan Pengelolaan Paket"
                     >
                         <HelpCircle className="w-4 h-4 text-[#5A6A85]" />
@@ -1083,7 +1084,7 @@ export const Packages: React.FC<PackagesProps> = ({
                     <button
                         type="button"
                         onClick={() => setIsTermsModalOpen(true)}
-                        className="py-2 sm:py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
+                        className="shrink-0 whitespace-nowrap py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
                         title="Kelola Syarat & Ketentuan Paket (Katalog Publik)"
                     >
                         <FileText className="w-4 h-4 text-[#5A6A85]" />
@@ -1093,7 +1094,7 @@ export const Packages: React.FC<PackagesProps> = ({
                     <button
                         type="button"
                         onClick={() => setIsPricelistModalOpen(true)}
-                        className="py-2 sm:py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
+                        className="shrink-0 whitespace-nowrap py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
                         title="Kelola Pricelist PDF"
                     >
                         <Upload className="w-4 h-4 text-[#5A6A85]" />
@@ -1103,7 +1104,7 @@ export const Packages: React.FC<PackagesProps> = ({
                     <button
                         type="button"
                         onClick={() => setIsWorkflowModalOpen(true)}
-                        className="py-2 sm:py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
+                        className="shrink-0 whitespace-nowrap py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
                         title="Kelola Workflow & Timeline (Katalog Publik)"
                     >
                         <List className="w-4 h-4 text-[#5A6A85]" />
@@ -1113,7 +1114,7 @@ export const Packages: React.FC<PackagesProps> = ({
                     <button
                         type="button"
                         onClick={() => setIsShareModalOpen(true)}
-                        className="py-2 sm:py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
+                        className="shrink-0 whitespace-nowrap py-2 px-3 rounded-xl border border-[#EAEFF4] bg-white hover:bg-[#F4F6F9] text-[#5A6A85] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 min-h-[44px] touch-manipulation cursor-pointer"
                         title="Bagikan Tautan Booking & Katalog"
                     >
                         <Share2 className="w-4 h-4 text-[#5D87FF]" />
@@ -1123,7 +1124,7 @@ export const Packages: React.FC<PackagesProps> = ({
                     <button
                         type="button"
                         onClick={handleOpenCreatePackage}
-                        className="flex-1 sm:flex-initial bg-[#5D87FF] hover:bg-[#4871e3] text-white font-bold px-3.5 sm:px-4 py-2 rounded-xl shadow-[0_4px_12px_rgba(93,135,255,0.25)] inline-flex items-center justify-center gap-1.5 sm:gap-2 text-xs transition-all min-h-[44px] touch-manipulation cursor-pointer"
+                        className="flex-1 sm:flex-initial min-w-[140px] shrink-0 whitespace-nowrap bg-[#5D87FF] hover:bg-[#4871e3] text-white font-bold px-3.5 sm:px-4 py-2 rounded-xl shadow-[0_4px_12px_rgba(93,135,255,0.25)] inline-flex items-center justify-center gap-1.5 sm:gap-2 text-xs transition-all min-h-[44px] touch-manipulation cursor-pointer"
                     >
                         <Plus className="w-4 h-4 flex-shrink-0" />
                         <span>Tambah Paket</span>

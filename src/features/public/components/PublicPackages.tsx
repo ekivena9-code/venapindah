@@ -365,16 +365,27 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
         }
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            if (file.size > 10 * 1024 * 1024) { // 10MB limit
-                alert('Ukuran file tidak boleh melebihi 10MB.');
-                e.target.value = '';
-                return;
-            }
-            setPaymentProof(file);
+    const handlePaymentProofFile = (file?: File) => {
+        if (!file) return;
+        if (!['image/png', 'image/jpeg', 'application/pdf'].includes(file.type)) {
+            alert('Format file harus PNG, JPG, atau PDF.');
+            return;
         }
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Ukuran file tidak boleh melebihi 10MB.');
+            return;
+        }
+        setPaymentProof(file);
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        handlePaymentProofFile(e.target.files?.[0]);
+        e.target.value = '';
+    };
+
+    const handlePaymentProofDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        handlePaymentProofFile(e.dataTransfer.files[0]);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -637,6 +648,59 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
                 }
 
+                #package-booking-form .input-group {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 5px !important;
+                }
+                #package-booking-form .input-label {
+                    position: static !important;
+                    order: -1;
+                    display: block !important;
+                    inset: auto !important;
+                    margin: 0 !important;
+                    font-size: 13px !important;
+                    line-height: 1.35 !important;
+                    transform: none !important;
+                    transition: none !important;
+                    background-color: transparent !important;
+                    color: var(--color-text-primary) !important;
+                }
+                #package-booking-form .input-field,
+                #package-booking-form .input-field:focus,
+                #package-booking-form select.input-field:focus {
+                    border: 1px solid #111 !important;
+                }
+                #package-booking-form .input-field::placeholder {
+                    color: rgba(42, 53, 71, 0.48) !important;
+                    opacity: 1 !important;
+                }
+                #package-booking-form .payment-summary {
+                    background-color: var(--color-accent) !important;
+                    border-color: var(--color-accent) !important;
+                }
+                #package-booking-form .payment-summary,
+                #package-booking-form .payment-summary :not(input) {
+                    color: #fff !important;
+                }
+                #package-booking-form .payment-summary .border-brand-border {
+                    border-color: rgba(255, 255, 255, 0.35) !important;
+                }
+                #package-booking-form .payment-summary .payment-bank-account {
+                    background-color: rgba(255, 255, 255, 0.12) !important;
+                    border-color: rgba(255, 255, 255, 0.35) !important;
+                }
+                #package-booking-form .payment-summary input.input-field {
+                    color: var(--color-text-primary) !important;
+                    caret-color: var(--color-text-primary) !important;
+                }
+                #package-booking-form .payment-summary .input-group {
+                    gap: 7px !important;
+                }
+                #package-booking-form .payment-summary .input-group > p {
+                    margin-top: 0 !important;
+                    line-height: 1.35 !important;
+                }
                 @media (max-width: 768px) {
                     #package-booking-form {
                         width: 100% !important;
@@ -685,33 +749,6 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                         padding: 0.65rem 0.75rem !important;
                         font-size: 16px !important;
                         line-height: 1.25 !important;
-                    }
-                    #package-booking-form .input-group {
-                        display: flex !important;
-                        flex-direction: column !important;
-                        gap: 6px !important;
-                    }
-                    #package-booking-form .input-label {
-                        position: static !important;
-                        order: -1;
-                        display: block !important;
-                        inset: auto !important;
-                        margin: 0 !important;
-                        font-size: 13px !important;
-                        line-height: 1.35 !important;
-                        transform: none !important;
-                        transition: none !important;
-                        color: var(--color-text-primary) !important;
-                    }
-                    #package-booking-form .input-field {
-                        border: 1px solid #111 !important;
-                        transition: none !important;
-                    }
-                    #package-booking-form .input-field:focus,
-                    #package-booking-form select.input-field:focus {
-                        border-color: #111 !important;
-                        box-shadow: none !important;
-                        transform: none !important;
                     }
                     #package-booking-form .input-field:focus-visible {
                         outline: 2px solid var(--color-accent) !important;
@@ -1301,8 +1338,8 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                                     <p className="text-xs text-brand-text-secondary">Lengkapi data diri dan detail acara Anda.</p>
                                 </div>
                                 <div className="space-y-4">
-                                    <div className="input-group"><input type="text" id="clientName" name="clientName" value={formData.clientName} onChange={handleFormChange} className="input-field" placeholder=" " required /><label htmlFor="clientName" className="input-label">Nama Pengantin</label></div>
-                                    <div className="input-group"><input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleFormChange} className="input-field" placeholder=" " required /><label htmlFor="phone" className="input-label">Nomor WhatsApp</label></div>
+                                    <div className="input-group"><input type="text" id="clientName" name="clientName" value={formData.clientName} onChange={handleFormChange} className="input-field" placeholder="Contoh: Andi & Sinta" required /><label htmlFor="clientName" className="input-label">Nama Pengantin</label></div>
+                                    <div className="input-group"><input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleFormChange} className="input-field" placeholder="Contoh: 0812 3456 7890" required /><label htmlFor="phone" className="input-label">Nomor WhatsApp</label></div>
                                     <div className="input-group">
                                         <input type="date" id="date" name="date" value={formData.date} onChange={handleFormChange} className="input-field" placeholder=" " />
                                         <label htmlFor="date" className="input-label">Tanggal Acara Pernikahan (Opsional)</label>
@@ -1313,7 +1350,7 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                                             </button>
                                         )}
                                     </div>
-                                    <div className="input-group"><input type="text" id="location" name="location" value={formData.location} onChange={handleFormChange} className="input-field" placeholder=" " /><label htmlFor="location" className="input-label">Alamat Acara Pernikahan</label></div>
+                                    <div className="input-group"><input type="text" id="location" name="location" value={formData.location} onChange={handleFormChange} className="input-field" placeholder="Contoh: Kota / nama gedung" /><label htmlFor="location" className="input-label">Alamat Acara Pernikahan</label></div>
                                 </div>
 
                                 <div className="pt-4 border-t border-brand-border space-y-4">
@@ -1513,7 +1550,7 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="input-group">
-                                        <input type="text" id="promoCode" name="promoCode" value={formData.promoCode} onChange={handleFormChange} className="input-field" placeholder=" " />
+                                        <input type="text" id="promoCode" name="promoCode" value={formData.promoCode} onChange={handleFormChange} className="input-field" placeholder="Contoh: WEDDING10" />
                                         <label htmlFor="promoCode" className="input-label">Kode Promo (Opsional)</label>
                                         {promoFeedback.message && <p className={`text-xs mt-1 ${promoFeedback.type === 'success' ? 'text-green-500' : 'text-red-500'}`}>{promoFeedback.message}</p>}
                                     </div>
@@ -1524,14 +1561,14 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                                             value={String(formData.transportCost ?? '')}
                                             onChange={(raw) => setFormData(prev => ({ ...prev, transportCost: raw }))}
                                             className="input-field"
-                                            placeholder=" "
+                                            placeholder="Contoh: 250.000"
                                         />
                                         <label htmlFor="transportCost" className="input-label">Fee Transport (Opsional)</label>
                                     </div>
                                 </div>
 
                                 {/* Cost Breakdown & DP Payment Box */}
-                                <div className="p-5 bg-brand-bg/60 border border-brand-border rounded-2xl space-y-4">
+                                <div className="payment-summary p-5 bg-brand-bg/60 border border-brand-border rounded-2xl space-y-4">
                                     <h4 className="text-xs font-bold text-brand-text-light uppercase tracking-wider">Rincian Pembayaran</h4>
                                     <div className="space-y-2 text-xs">
                                         <div className="flex justify-between items-center text-brand-text-secondary">
@@ -1576,10 +1613,10 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                                         </div>
                                     </div>
 
-                                    <div className="pt-3 border-t border-brand-border space-y-3">
+                                    <div className="pt-3 border-t border-brand-border space-y-4">
                                         <div className="text-xs space-y-1">
                                             <p className="text-brand-text-secondary">Silakan transfer Uang Muka (DP) ke rekening:</p>
-                                            <p className="font-bold text-brand-text-light p-2 bg-brand-surface rounded-xl border border-brand-border text-center tracking-wide">{userProfile.bankAccount}</p>
+                                            <p className="payment-bank-account font-bold text-brand-text-light p-2 bg-brand-surface rounded-xl border border-brand-border text-center tracking-wide">{userProfile.bankAccount}</p>
                                         </div>
                                         <div className="input-group !mt-0">
                                             <RupiahInput
@@ -1588,7 +1625,7 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                                                 value={String(formData.dp ?? '')}
                                                 onChange={(raw) => setFormData(prev => ({ ...prev, dp: raw }))}
                                                 className="input-field text-right font-bold"
-                                                placeholder=" "
+                                                placeholder="Contoh: 1.500.000"
                                             />
                                             <label htmlFor="dp" className="input-label">Jumlah DP</label>
                                             <p className="text-[11px] text-brand-text-secondary mt-1 text-right">Saran DP (30%): <strong className="text-brand-accent">{formatCurrency(suggestedDp)}</strong></p>
@@ -1598,17 +1635,24 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
 
                                 <div className="space-y-2">
                                     <label htmlFor="dpPaymentProof" className="text-xs font-bold text-brand-text-light block">Unggah Bukti Transfer DP</label>
-                                    <div className="flex justify-center rounded-2xl border border-dashed border-brand-border bg-brand-bg/40 px-6 py-8 hover:bg-brand-bg/80 transition-colors">
-                                        <div className="text-center">
-                                            <UploadIcon className="mx-auto h-10 w-10 text-brand-text-secondary mb-2" />
-                                            <div className="flex text-xs leading-6 text-brand-text-secondary">
-                                                <label htmlFor="dpPaymentProof" className="relative cursor-pointer rounded-md bg-brand-surface px-2 py-1 font-semibold text-brand-accent border border-brand-border hover:bg-brand-surface/80">
+                                    <div
+                                        onDragOver={(event) => event.preventDefault()}
+                                        onDrop={handlePaymentProofDrop}
+                                        className="flex min-h-[92px] items-center gap-3 rounded-xl border border-dashed border-white/40 bg-brand-accent px-3 py-3 text-white transition-colors hover:bg-brand-accent/90 sm:px-4"
+                                    >
+                                        <UploadIcon className="h-7 w-7 shrink-0 text-white" />
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                                                <label htmlFor="dpPaymentProof" className="relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md border border-white bg-white px-2 py-0.5 text-[10px] font-semibold leading-4 text-brand-accent hover:bg-white/90">
                                                     <span>Pilih file</span>
                                                     <input id="dpPaymentProof" name="dpPaymentProof" type="file" className="sr-only" onChange={handleFileChange} accept="image/png, image/jpeg, image/jpg, application/pdf" />
                                                 </label>
-                                                <p className="pl-2 pt-1">atau seret dan lepas</p>
+                                                <span className="min-w-0 truncate text-xs text-white" title={paymentProof?.name || 'No file chosen'}>
+                                                    {paymentProof?.name || 'No file chosen'}
+                                                </span>
                                             </div>
-                                            <p className="text-[11px] text-brand-text-secondary mt-1">PNG, JPG, PDF hingga 10MB {paymentProof ? `(Dipilih: ${paymentProof.name})` : ''}</p>
+                                            <p className="mt-1 text-[11px] leading-4 text-white/90">atau seret dan lepas</p>
+                                            <p className="text-[11px] leading-4 text-white/90">PNG, JPG, PDF hingga 10MB</p>
                                         </div>
                                     </div>
                                 </div>
