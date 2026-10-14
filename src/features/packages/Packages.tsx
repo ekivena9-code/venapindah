@@ -330,7 +330,7 @@ export const Packages: React.FC<PackagesProps> = ({
     // ── Main UI States ──
     const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
     const [searchTerm, setSearchTerm] = useState('');
-    const [regionFilter, setRegionFilter] = useState<string>('');
+    const [regionFilter, setRegionFilter] = useState<string>(REGIONS[0]?.value || '');
     const [categoryFilter, setCategoryFilter] = useState<string>('');
     const [packageOrder, setPackageOrder] = useState<string[]>(() => profile.publicPageConfig?.packageOrder || []);
     const [addOnOrder, setAddOnOrder] = useState<string[]>(() => profile.publicPageConfig?.addOnOrder || []);
@@ -1243,9 +1243,6 @@ export const Packages: React.FC<PackagesProps> = ({
                         {regionFilter && <span className="text-[10px] sm:text-xs text-[#5A6A85]">{catalogEntries.length} item</span>}
                     </div>
                     <div className="flex flex-wrap items-center gap-1.5">
-                        <button type="button" onClick={() => setRegionFilter('')} aria-pressed={regionFilter === ''} className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold border whitespace-nowrap ${regionFilter === '' ? 'bg-[#5D87FF] text-white border-[#5D87FF]' : 'bg-white border-[#EAEFF4] text-[#5A6A85] hover:bg-[#F4F6F9]'}`}>
-                            Semua Wilayah
-                        </button>
                         {unionRegions.map(region => (
                             <button key={region.value} type="button" onClick={() => setRegionFilter(region.value)} aria-pressed={regionFilter === region.value} className={`px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold border whitespace-nowrap ${regionFilter === region.value ? 'bg-[#5D87FF] text-white border-[#5D87FF]' : 'bg-white border-[#EAEFF4] text-[#5A6A85] hover:bg-[#F4F6F9]'}`}>
                                 {region.label}

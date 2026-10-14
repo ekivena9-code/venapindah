@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Check, ListTodo, Plus, Search, SlidersHorizontal, Trash2, X } from 'lucide-react';
+import { Check, ListTodo, Pencil, Plus, Save, Search, SlidersHorizontal, Trash2, X } from 'lucide-react';
 import { Project, TeamMember, Profile, AssignedTeamMember, Client, ViewType, NavigationAction, CalendarEvent, PaymentStatus } from '../../../types';
-import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, UsersIcon, FileTextIcon, PlusIcon, MapPinIcon, CalendarIcon, DollarSignIcon, LinkIcon, FolderKanbanIcon, BriefcaseIcon } from '../../../constants';
+import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, UsersIcon, PlusIcon, MapPinIcon, CalendarIcon, DollarSignIcon, LinkIcon, FolderKanbanIcon, BriefcaseIcon } from '../../../constants';
 import Modal from '../../../shared/ui/Modal';
 import BottomSheet from '../../../shared/ui/BottomSheet';
 import StatCard from '../../../shared/ui/StatCard';
 import { MobileCollapsibleSection } from '../../../components/ui/MobileProgressiveDisclosure';
 import { listCalendarEventsInRange, createCalendarEvent, updateCalendarEvent, deleteCalendarEvent, parseProjectMeetingNotes } from '../../../services/calendarEvents';
+import { updateProject as updateProjectInDb } from '../../../services/projects';
 import supabase from '../../../lib/supabaseClient';
 
 // --- HELPER FUNCTIONS ---
@@ -1220,6 +1221,8 @@ interface EventPanelProps {
     onDelete: () => void;
     onNavigateToProject?: (projectId: string) => void;
     onNavigateToClient?: (clientId: string) => void;
+    canEditProjectNotes: boolean;
+    onSaveProjectNotes: (notes: string) => Promise<void>;
     onTaskToggle?: (taskId: string, completed: boolean) => void;
     onTaskAdd?: (taskName: string) => void;
     onTaskDelete?: (taskId: string) => void;
@@ -1248,7 +1251,7 @@ interface ClientViewProps {
 
 const ClientView: React.FC<ClientViewProps> = ({ projects, clients, profile, onEventClick }) => {
     const clientStats = useMemo(() => {
-        const stats = new Map<string, { client: Client | null; clientName: string; events: Project[]; teamMembers: Set<string>; totalCost: number }>();
+        const stats = new Map<string, { client: Client | null; clientName: string; events: Project[]; teamMembers: Set<string> }>();
 
         projects.forEach(p => {
             if (!p.clientId || p.clientId === 'INTERNAL') return;
@@ -1259,14 +1262,12 @@ const ClientView: React.FC<ClientViewProps> = ({ projects, clients, profile, onE
                     client,
                     clientName: client?.name || p.clientName || 'Unknown Client',
                     events: [],
-                    teamMembers: new Set(),
-                    totalCost: 0
+                    teamMembers: new Set()
                 });
             }
 
             const stat = stats.get(p.clientId)!;
             stat.events.push(p);
-            stat.totalCost += p.totalCost || 0;
             if (p.team) {
                 p.team.forEach(t => stat.teamMembers.add(t.name));
             }
@@ -1298,26 +1299,12 @@ const ClientView: React.FC<ClientViewProps> = ({ projects, clients, profile, onE
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-2 mb-5 bg-white/40 p-3 rounded-xl border border-brand-border/30">
-                                <div>
-                                    <p className="text-[10px] text-brand-text-secondary font-semibold uppercase tracking-wider mb-1">Total Nilai</p>
-                                    <p className="font-bold text-brand-text-light text-sm">{formatCurrency(stat.totalCost)}</p>
-                                </div>
+                            <div className="mb-5 rounded-xl border border-brand-border/30 bg-white/40 p-3">
                                 <div>
                                     <p className="text-[10px] text-brand-text-secondary font-semibold uppercase tracking-wider mb-1">Tim Terlibat</p>
-                                    <div className="flex -space-x-2 overflow-hidden">
-                                        {Array.from(stat.teamMembers).slice(0, 4).map((name, i) => (
-                                            <div key={i} className="w-6 h-6 rounded-full bg-brand-input flex items-center justify-center text-[8px] font-bold text-brand-text-secondary border border-white" title={name as string}>
-                                                {getInitials(name as string)}
-                                            </div>
-                                        ))}
-                                        {stat.teamMembers.size > 4 && (
-                                            <div className="w-6 h-6 rounded-full bg-brand-bg flex items-center justify-center text-[8px] font-bold text-brand-text-secondary border border-white">
-                                                +{stat.teamMembers.size - 4}
-                                            </div>
-                                        )}
-                                        {stat.teamMembers.size === 0 && <span className="text-xs text-brand-text-secondary">Belum ada tim</span>}
-                                    </div>
+                                    <p className="break-words text-xs leading-5 text-brand-text-secondary">
+                                        {Array.from(stat.teamMembers).join(', ') || 'Belum ada tim'}
+                                    </p>
                                 </div>
                             </div>
 
@@ -1522,13 +1509,26 @@ const TeamView: React.FC<TeamViewProps> = ({ currentDate, eventsByDate, teamMemb
     );
 };
 
-const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, eventForm, teamMembers, clients, profile, canDelete, onClose, onSetMode, onFormChange, onFormCustomColorChange, onTeamChange, onSubmit, onDelete, onNavigateToProject, onNavigateToClient, onTaskToggle, onTaskAdd, onTaskDelete }) => {
-    const [activeTab, setActiveTab] = React.useState<'info' | 'team' | 'finance'>('info');
+const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, eventForm, teamMembers, clients, profile, canDelete, onClose, onSetMode, onFormChange, onFormCustomColorChange, onTeamChange, onSubmit, onDelete, onNavigateToProject, onNavigateToClient, canEditProjectNotes, onSaveProjectNotes, onTaskToggle, onTaskAdd, onTaskDelete }) => {
+    const [activeTab, setActiveTab] = React.useState<'info' | 'team' | 'notes'>('info');
     const [taskDraft, setTaskDraft] = React.useState('');
+    const [projectNotesDraft, setProjectNotesDraft] = React.useState('');
+    const [isEditingProjectNotes, setIsEditingProjectNotes] = React.useState(false);
+    const [isSavingProjectNotes, setIsSavingProjectNotes] = React.useState(false);
+    const [projectNotesMessage, setProjectNotesMessage] = React.useState('');
 
     React.useEffect(() => {
         if (!isOpen) setActiveTab('info');
     }, [isOpen]);
+
+    React.useEffect(() => {
+        setProjectNotesDraft(selectedEvent?.notes || '');
+        setIsEditingProjectNotes(false);
+    }, [selectedEvent?.id, selectedEvent?.notes]);
+
+    React.useEffect(() => {
+        setProjectNotesMessage('');
+    }, [selectedEvent?.id]);
 
     const tasks = selectedEvent?.tasks || [];
     const completedTaskCount = tasks.filter(task => task.completed).length;
@@ -1539,6 +1539,21 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
         if (!taskName || !onTaskAdd) return;
         onTaskAdd(taskName);
         setTaskDraft('');
+    };
+
+    const handleProjectNotesSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSavingProjectNotes(true);
+        setProjectNotesMessage('');
+        try {
+            await onSaveProjectNotes(projectNotesDraft);
+            setIsEditingProjectNotes(false);
+            setProjectNotesMessage('Keterangan berhasil disimpan.');
+        } catch {
+            setProjectNotesMessage('Keterangan gagal disimpan. Silakan coba lagi.');
+        } finally {
+            setIsSavingProjectNotes(false);
+        }
     };
 
     return (
@@ -1571,9 +1586,9 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                             {selectedEvent.clientId !== 'INTERNAL' && (
                                 <>
                                     <button onClick={() => setActiveTab('team')} className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'team' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Tim</button>
-                                    <button onClick={() => setActiveTab('finance')} className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'finance' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Keuangan</button>
                                 </>
                             )}
+                            <button onClick={() => setActiveTab('notes')} className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'notes' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Keterangan</button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto custom-scrollbar bg-white/30">
@@ -1594,11 +1609,53 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                                             <ChevronRightIcon className="w-5 h-5 text-brand-text-secondary" />
                                         </div>
                                     )}
-                                    <div className="mt-6 space-y-5 text-sm">
-                                        <div className="flex items-start gap-4"><ClockIcon className="w-5 h-5 text-brand-text-secondary flex-shrink-0 mt-0.5" /><p className="text-brand-text-primary font-medium">{(() => { const _d = new Date(selectedEvent.date); const _wd = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu']; const _mo = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; return `${_wd[_d.getDay()]} ${_d.getDate()} ${_mo[_d.getMonth()]}`; })()} <br /><span className="text-brand-text-secondary">{selectedEvent.startTime && selectedEvent.endTime ? `${selectedEvent.startTime} - ${selectedEvent.endTime}` : 'Sepanjang hari'}</span></p></div>
-                                        {selectedEvent.location && (<div className="flex items-start gap-4"><MapPinIcon className="w-5 h-5 text-brand-text-secondary flex-shrink-0 mt-0.5" /><p className="text-brand-text-primary font-medium">{selectedEvent.location}</p></div>)}
-                                        {selectedEvent.notes && <div className="flex items-start gap-4"><FileTextIcon className="w-5 h-5 text-brand-text-secondary flex-shrink-0 mt-0.5" /><p className="text-brand-text-primary whitespace-pre-wrap">{selectedEvent.notes}</p></div>}
-                                    </div>
+                                    {selectedEvent.clientId === 'INTERNAL' ? (
+                                        <div className="mt-6 space-y-5 text-sm">
+                                            <div className="flex items-start gap-4"><ClockIcon className="w-5 h-5 text-brand-text-secondary flex-shrink-0 mt-0.5" /><p className="text-brand-text-primary font-medium">{(() => { const _d = new Date(selectedEvent.date); const _wd = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu']; const _mo = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; return `${_wd[_d.getDay()]} ${_d.getDate()} ${_mo[_d.getMonth()]}`; })()} <br /><span className="text-brand-text-secondary">{selectedEvent.startTime && selectedEvent.endTime ? `${selectedEvent.startTime} - ${selectedEvent.endTime}` : 'Sepanjang hari'}</span></p></div>
+                                            {selectedEvent.location && (<div className="flex items-start gap-4"><MapPinIcon className="w-5 h-5 text-brand-text-secondary flex-shrink-0 mt-0.5" /><p className="text-brand-text-primary font-medium">{selectedEvent.location}</p></div>)}
+                                        </div>
+                                    ) : (
+                                        <div className="mt-6 space-y-6">
+                                            <section>
+                                                <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text-secondary">Informasi Utama</h4>
+                                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                                    <div><p className="text-xs text-brand-text-secondary">Pengantin</p><p className="text-sm font-medium text-brand-text-primary">{selectedEvent.clientName || '—'}</p></div>
+                                                    <div><p className="text-xs text-brand-text-secondary">Lokasi / Kota</p><p className="text-sm font-medium text-brand-text-primary">{selectedEvent.location || '—'}</p></div>
+                                                    <div><p className="text-xs text-brand-text-secondary">Tanggal Acara</p><p className="text-sm font-medium text-brand-text-primary">{new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(selectedEvent.date))}</p></div>
+                                                    <div><p className="text-xs text-brand-text-secondary">Alamat Lengkap / Gedung</p><p className="text-sm font-medium text-brand-text-primary">{selectedEvent.address || '—'}</p></div>
+                                                    <div className="sm:col-span-2">
+                                                        <p className="text-xs text-brand-text-secondary">Google Maps</p>
+                                                        {selectedEvent.googleMapsLink ? (
+                                                            <a href={selectedEvent.googleMapsLink} target="_blank" rel="noopener noreferrer" className="break-all text-sm font-medium text-brand-accent hover:underline">Buka lokasi di Google Maps</a>
+                                                        ) : <p className="text-sm font-medium text-brand-text-primary">—</p>}
+                                                    </div>
+                                                    <div><p className="text-xs text-brand-text-secondary">Jam Mulai</p><p className="text-sm font-medium text-brand-text-primary">{selectedEvent.startTime || '—'}</p></div>
+                                                    <div><p className="text-xs text-brand-text-secondary">Jam Selesai</p><p className="text-sm font-medium text-brand-text-primary">{selectedEvent.endTime || '—'}</p></div>
+                                                </div>
+                                            </section>
+
+                                            <section>
+                                                <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-brand-text-secondary">File &amp; Tautan Penting</h4>
+                                                <div className="space-y-2">
+                                                    {[
+                                                        { title: 'Brief / Moodboard', description: 'Link internal untuk tim', url: selectedEvent.driveLink, emptyText: 'Belum ada' },
+                                                        { title: 'File dari Pengantin', description: 'Foto / dokumen diterima dari pengantin', url: selectedEvent.clientDriveLink, emptyText: 'Belum ada' },
+                                                        { title: 'File Jadi (Hasil Akhir)', description: 'Link hasil dokumentasi untuk dikirim ke pengantin', url: selectedEvent.finalDriveLink, emptyText: 'Belum tersedia' },
+                                                    ].map(file => (
+                                                        <div key={file.title} className="flex items-center justify-between gap-3 rounded-xl border border-brand-border/40 bg-white/50 p-3">
+                                                            <div className="min-w-0">
+                                                                <p className="text-xs font-semibold text-brand-text-primary">{file.title}</p>
+                                                                <p className="mt-0.5 text-xs text-brand-text-secondary">{file.description}</p>
+                                                            </div>
+                                                            {file.url ? (
+                                                                <a href={file.url} target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-lg border border-brand-border/50 bg-white px-3 py-1.5 text-xs font-semibold text-brand-accent hover:bg-brand-bg">Buka</a>
+                                                            ) : <span className="shrink-0 text-xs italic text-brand-text-secondary">{file.emptyText}</span>}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </section>
+                                        </div>
+                                    )}
 
                                     {canDelete && (
                                         <section className="mt-6 rounded-2xl border border-[#DCE6F8] bg-gradient-to-br from-white to-[#F5F8FF] p-4 shadow-sm">
@@ -1706,46 +1763,97 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                                 </div>
                             )}
 
-                            {activeTab === 'finance' && (
+                            {activeTab === 'notes' && (
                                 <div className="p-6">
-                                    <h4 className="font-semibold text-brand-text-light mb-4 text-sm uppercase tracking-wider text-brand-text-secondary">Informasi Keuangan</h4>
-                                    {selectedEvent.packageName && (
-                                        <div className="mb-4">
-                                            <p className="text-xs text-brand-text-secondary">Paket</p>
-                                            <p className="font-semibold text-brand-text-light text-sm">{selectedEvent.packageName}</p>
+                                    <h4 className="font-semibold text-brand-text-light mb-4 text-sm uppercase tracking-wider text-brand-text-secondary">Keterangan</h4>
+                                    {selectedEvent.clientId === 'INTERNAL' ? (
+                                        <form onSubmit={onSubmit} className="space-y-3">
+                                            <textarea
+                                                name="notes"
+                                                value={eventForm.notes}
+                                                onChange={onFormChange}
+                                                rows={4}
+                                                placeholder="Tulis keterangan acara..."
+                                                aria-label="Keterangan acara"
+                                                className="input-field w-full bg-white/80 custom-scrollbar"
+                                            />
+                                            <button type="submit" className="button-primary">Simpan Keterangan</button>
+                                        </form>
+                                    ) : canEditProjectNotes ? (
+                                        <div className="space-y-3">
+                                            {isEditingProjectNotes ? (
+                                                <form onSubmit={handleProjectNotesSubmit} className="space-y-3">
+                                                    <textarea
+                                                        value={projectNotesDraft}
+                                                        onChange={e => setProjectNotesDraft(e.target.value)}
+                                                        rows={4}
+                                                        placeholder="Tulis keterangan acara..."
+                                                        aria-label="Keterangan acara"
+                                                        className="input-field w-full bg-white/80 custom-scrollbar"
+                                                    />
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <button
+                                                            type="button"
+                                                            disabled={isSavingProjectNotes}
+                                                            onClick={() => {
+                                                                setProjectNotesDraft(selectedEvent.notes || '');
+                                                                setProjectNotesMessage('');
+                                                                setIsEditingProjectNotes(false);
+                                                            }}
+                                                            className="button-secondary inline-flex items-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-60"
+                                                        >
+                                                            <X className="h-4 w-4" /> Batal
+                                                        </button>
+                                                        <button type="submit" disabled={isSavingProjectNotes} className="button-primary inline-flex items-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-60">
+                                                            <Save className="h-4 w-4" />
+                                                            {isSavingProjectNotes ? 'Menyimpan...' : 'Simpan Keterangan'}
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            ) : (
+                                                <>
+                                                    {selectedEvent.notes ? (
+                                                        <p className="whitespace-pre-wrap text-sm text-brand-text-primary">{selectedEvent.notes}</p>
+                                                    ) : (
+                                                        <p className="text-sm italic text-brand-text-secondary">Belum ada keterangan.</p>
+                                                    )}
+                                                    <button type="button" onClick={() => setIsEditingProjectNotes(true)} className="button-secondary inline-flex items-center gap-1.5">
+                                                        <Pencil className="h-4 w-4" /> Edit Keterangan
+                                                    </button>
+                                                </>
+                                            )}
+                                            {projectNotesMessage && <p role="status" className="text-sm text-brand-text-secondary">{projectNotesMessage}</p>}
                                         </div>
+                                    ) : onNavigateToProject && !selectedEvent.id.endsWith('-deadline') ? (
+                                        <div>
+                                            {selectedEvent.notes ? (
+                                                <p className="mb-4 text-sm text-brand-text-primary whitespace-pre-wrap">{selectedEvent.notes}</p>
+                                            ) : (
+                                                <p className="mb-4 text-sm text-brand-text-secondary italic">Belum ada keterangan.</p>
+                                            )}
+                                            <button onClick={() => onNavigateToProject(selectedEvent.id)} className="button-secondary">
+                                                Tambah Keterangan di Halaman Acara Agenda
+                                            </button>
+                                        </div>
+                                    ) : selectedEvent.notes ? (
+                                        <p className="text-sm text-brand-text-primary whitespace-pre-wrap">{selectedEvent.notes}</p>
+                                    ) : (
+                                        <p className="text-sm text-brand-text-secondary italic">Belum ada keterangan.</p>
                                     )}
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="p-3 bg-white/50 border border-brand-border/40 rounded-xl">
-                                            <p className="text-[10px] text-brand-text-secondary uppercase tracking-wider mb-1">Total Biaya</p>
-                                            <p className="font-bold text-brand-text-light">{formatCurrency(selectedEvent.totalCost || 0)}</p>
-                                        </div>
-                                        <div className="p-3 bg-white/50 border border-brand-border/40 rounded-xl">
-                                            <p className="text-[10px] text-brand-text-secondary uppercase tracking-wider mb-1">Terbayar</p>
-                                            <p className="font-bold text-brand-accent">{formatCurrency(selectedEvent.amountPaid || 0)}</p>
-                                        </div>
-                                    </div>
-                                    <div className="mt-4 p-3 bg-white/50 border border-brand-border/40 rounded-xl flex items-center justify-between">
-                                        <span className="text-sm font-medium text-brand-text-secondary">Status</span>
-                                        <span className="text-sm font-bold px-2 py-1 rounded border" style={{ 
-                                            color: selectedEvent.paymentStatus === 'Lunas' ? '#16a34a' : selectedEvent.paymentStatus === 'DP Terbayar' ? '#ca8a04' : '#dc2626',
-                                            backgroundColor: selectedEvent.paymentStatus === 'Lunas' ? '#f0fdf4' : selectedEvent.paymentStatus === 'DP Terbayar' ? '#fefce8' : '#fef2f2',
-                                            borderColor: selectedEvent.paymentStatus === 'Lunas' ? '#bbf7d0' : selectedEvent.paymentStatus === 'DP Terbayar' ? '#fef08a' : '#fecaca'
-                                        }}>
-                                            {selectedEvent.paymentStatus || 'Belum Bayar'}
-                                        </span>
-                                    </div>
                                 </div>
                             )}
                         </div>
 
                         <div className="p-6 border-t border-brand-border/40 space-y-2 shrink-0 bg-white/30">
-                            {selectedEvent.clientId !== 'INTERNAL' && onNavigateToProject && !selectedEvent.id.endsWith('-deadline') && (
-                                <button onClick={() => onNavigateToProject(selectedEvent.id)} className="button-secondary w-full inline-flex items-center justify-center gap-2">
-                                    <FolderKanbanIcon className="w-5 h-5" /> Buka Halaman Acara Agenda
+                            {selectedEvent.clientId === 'INTERNAL' ? (
+                                <button onClick={() => onSetMode('edit')} className="button-primary w-full">Edit Detail Acara Agenda</button>
+                            ) : onNavigateToProject && !selectedEvent.id.endsWith('-deadline') ? (
+                                <button onClick={() => onNavigateToProject(selectedEvent.id)} className="button-primary w-full inline-flex items-center justify-center gap-2">
+                                    <FolderKanbanIcon className="w-5 h-5" /> Edit di Halaman Acara Agenda
                                 </button>
+                            ) : (
+                                <button onClick={() => onSetMode('edit')} className="button-primary w-full">Lihat Detail (Baca Saja)</button>
                             )}
-                            <button onClick={() => onSetMode('edit')} className="button-primary w-full">{profile.eventTypes?.includes(selectedEvent.projectType) ? 'Edit Detail Acara Agenda' : 'Lihat Detail (Baca Saja)'}</button>
                             {selectedEvent.clientId === 'INTERNAL' && (
                                 <button
                                     onClick={onDelete}
@@ -1820,7 +1928,7 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                                     })}
                                 </div>
                             </div>
-                            <div className="input-group"><textarea name="notes" id="eventNotes" value={eventForm.notes} onChange={onFormChange} className="input-field bg-white/80 custom-scrollbar" rows={3} placeholder=" "></textarea><label htmlFor="eventNotes" className="input-label">Catatan</label></div>
+                            <div className="input-group"><textarea name="notes" id="eventNotes" value={eventForm.notes} onChange={onFormChange} className="input-field bg-white/80 custom-scrollbar" rows={3} placeholder=" "></textarea><label htmlFor="eventNotes" className="input-label">Keterangan</label></div>
                             <div className="flex justify-end gap-3 pt-6 pb-2 border-t border-brand-border/40">
                                 {selectedEvent && canDelete && (
                                     <button type="button" onClick={onDelete} className="text-red-500 hover:text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg text-sm font-semibold transition-colors mr-auto">Hapus</button>
@@ -1972,7 +2080,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ projects, setProject
 
     const filteredEvents = useMemo(() => {
         const deadlineEvents = (projects || [])
-            .filter(p => (p as Project & { deadlineDate?: string }).deadlineDate)
+            .filter(p => {
+                const deadlineDate = (p as Project & { deadlineDate?: string }).deadlineDate;
+                return deadlineDate && deadlineDate.slice(0, 10) !== p.date.slice(0, 10);
+            })
             .map(p => ({
                 ...p,
                 id: `${p.id}-deadline`,
@@ -2114,6 +2225,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ projects, setProject
     };
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setEventForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+    const handleProjectNotesSave = async (notes: string) => {
+        if (!selectedEvent) throw new Error('Tidak ada acara yang dipilih.');
+        const projectId = selectedEvent.id.replace(/-deadline$/, '');
+        const project = projects.find(item => item.id === projectId);
+        if (!project) throw new Error('Data proyek tidak ditemukan.');
+
+        const updated = await updateProjectInDb(project.id, { notes });
+        setProjects(prev => prev.map(item => item.id === project.id ? { ...item, notes: updated.notes } : item));
+        setSelectedEvent(prev => prev?.id.replace(/-deadline$/, '') === project.id ? { ...prev, notes: updated.notes } : prev);
+    };
+
     const handleTeamChange = (memberId: string) => {
         const member = teamMembers.find(m => m.id === memberId);
         if (!member) return;
@@ -2661,6 +2784,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ projects, setProject
                     clients={clients}
                     profile={profile}
                     canDelete={selectedEvent ? internalEvents.some(event => event.id === selectedEvent.id) : false}
+                    canEditProjectNotes={selectedEvent ? projects.some(project => project.id === selectedEvent.id.replace(/-deadline$/, '')) : false}
+                    onSaveProjectNotes={handleProjectNotesSave}
                     onClose={() => setIsPanelOpen(false)}
                     onSetMode={setPanelMode}
                     onFormChange={handleFormChange}

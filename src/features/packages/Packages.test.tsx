@@ -9,6 +9,51 @@ vi.mock('../../services/profile', () => ({
 }));
 
 describe('Packages catalog layout', () => {
+  it('filters the catalog to the default region on first open', () => {
+    render(
+      <Packages
+        packages={[
+          {
+            id: 'pkg-vendor',
+            name: 'Paket Vendor',
+            price: 5000000,
+            category: 'Wedding',
+            region: 'vendor',
+            physicalItems: [],
+            digitalItems: [],
+          },
+          {
+            id: 'pkg-banten',
+            name: 'Paket Banten',
+            price: 7000000,
+            category: 'Wedding',
+            region: 'banten',
+            physicalItems: [],
+            digitalItems: [],
+          },
+        ]}
+        setPackages={vi.fn()}
+        addOns={[
+          { id: 'addon-vendor', name: 'Add-On Vendor', price: 500000, region: 'vendor' },
+          { id: 'addon-banten', name: 'Add-On Banten', price: 700000, region: 'banten' },
+        ]}
+        setAddOns={vi.fn()}
+        projects={[]}
+        profile={{ packageCategories: ['Wedding'] } as any}
+        setProfile={vi.fn()}
+        showNotification={vi.fn()}
+        initialAction={null}
+        setInitialAction={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Vendor' }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByText('Paket Vendor')).toBeTruthy();
+    expect(screen.queryByText('Paket Banten')).toBeNull();
+    expect(screen.getByText('Add-On Vendor')).toBeTruthy();
+    expect(screen.queryByText('Add-On Banten')).toBeNull();
+  });
+
   it('renders package and add-on sections separately with add-ons below packages', () => {
     render(
       <Packages
@@ -108,6 +153,7 @@ describe('Packages catalog layout', () => {
       />,
     );
 
+    fireEvent.click(screen.getByRole('button', { name: 'Banten' }));
     fireEvent.click(screen.getByRole('button', { name: 'Duplikat Add-On' }));
     expect(screen.getByRole('heading', { name: 'Duplikasi Add-On ke Wilayah Lain' })).toBeTruthy();
     fireEvent.click(screen.getAllByRole('button', { name: 'Banten' })[1]);

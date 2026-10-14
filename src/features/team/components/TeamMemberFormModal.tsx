@@ -137,8 +137,8 @@ export const TeamMemberFormModal: React.FC<TeamMemberFormModalProps> = ({
                     <h5 className="text-sm font-semibold text-brand-text-light mb-3">Kontak</h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="input-group">
-                            <input type="email" id="email" name="email" value={formData.email} onChange={handleFormChange} className="input-field" placeholder=" " required />
-                            <label htmlFor="email" className="input-label">Email</label>
+                            <input type="email" id="email" name="email" value={formData.email} onChange={handleFormChange} className="input-field" placeholder=" " />
+                            <label htmlFor="email" className="input-label">Email (Opsional)</label>
                             <p className="hidden sm:block text-xs text-brand-text-secondary mt-1">Email untuk komunikasi dan akses portal</p>
                         </div>
                         <div className="input-group">
@@ -153,8 +153,8 @@ export const TeamMemberFormModal: React.FC<TeamMemberFormModalProps> = ({
                     <h5 className="text-sm font-semibold text-brand-text-light mb-3">Informasi Pembayaran</h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="input-group">
-                            <RupiahInput id="standardFee" value={formData.standardFee.toString()} onChange={(raw) => setFormData(prev => ({ ...prev, standardFee: Number(raw) }))} className="input-field" placeholder=" " required />
-                            <label htmlFor="standardFee" className="input-label">Fee Standar (IDR)</label>
+                            <RupiahInput id="standardFee" value={formData.standardFee.toString()} onChange={(raw) => setFormData(prev => ({ ...prev, standardFee: Number(raw) }))} className="input-field" placeholder=" " />
+                            <label htmlFor="standardFee" className="input-label">Fee Standar (IDR) (Opsional)</label>
                             <p className="hidden sm:block text-xs text-brand-text-secondary mt-1">Fee default per Acara Pernikahan dalam Rupiah</p>
                         </div>
                         <div className="input-group">

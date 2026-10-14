@@ -133,7 +133,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const [categoryNameDraft, setCategoryNameDraft] = useState('');
   const [isInitializingChecklist, setIsInitializingChecklist] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [mobileSectionTab, setMobileSectionTab] = useState<'all' | 'info' | 'meetings' | 'team' | 'checklist' | 'terms' | 'workflow' | 'files'>('all');
+  const [mobileSectionTab, setMobileSectionTab] = useState<'info' | 'meetings' | 'team' | 'checklist' | 'terms' | 'workflow' | 'files'>('info');
 
   const startSectionEdit = (section: ProjectEditSection) => {
     setEditingSection(section);
@@ -755,7 +755,6 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           <div className="sticky top-0 z-20 -mx-1 px-1 py-1.5 bg-white/95 backdrop-blur-md border-b border-slate-200">
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
               {([
-                { id: 'all', label: customizeUiText('project.detail.tab.all', 'Semua', uiTextOverrides) },
                 { id: 'info', label: customizeUiText('project.detail.tab.info', 'Info & Status', uiTextOverrides) },
                 { id: 'meetings', label: customizeUiText('project.detail.tab.meetings', 'Meeting', uiTextOverrides) },
                 { id: 'team', label: `${customizeUiText('project.detail.tab.team', 'Tim & Paket', uiTextOverrides)} (${selectedProject.team?.length || 0})` },
@@ -783,9 +782,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           </div>
 
           {/* ──────────── SEKSI 1: INFORMASI & STATUS ACARA ──────────── */}
-          {(mobileSectionTab === 'all' || mobileSectionTab === 'info' || mobileSectionTab === 'meetings') && (
+          {(mobileSectionTab === 'info' || mobileSectionTab === 'meetings') && (
             <>
-              {(mobileSectionTab === 'all' || mobileSectionTab === 'info') && (
+              {mobileSectionTab === 'info' && (
                 <>
               <section>
                 <SectionHeading title={customizeUiText('project.detail.section.main', 'Informasi Utama', uiTextOverrides)} action={sectionEditButton('info')} />
@@ -897,7 +896,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 </>
               )}
 
-              {(mobileSectionTab === 'all' || mobileSectionTab === 'meetings') && (
+              {mobileSectionTab === 'meetings' && (
               <section>
                 <SectionHeading title={customizeUiText('project.detail.section.meetings', 'Jadwal Meeting & Hasil', uiTextOverrides)} />
                 <div className="grid grid-cols-1 gap-3">
@@ -1067,7 +1066,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           )}
 
           {/* ──────────── SEKSI TIM & BIAYA PAKET ──────────── */}
-          {(mobileSectionTab === 'all' || mobileSectionTab === 'team') && (
+          {mobileSectionTab === 'team' && (
             <>
               <section>
                 <SectionHeading title="Tugas Tim dan Vendor" action={sectionEditButton('team')} />
@@ -1153,13 +1152,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             </>
           )}
 
-          {(mobileSectionTab === 'all' || mobileSectionTab === 'terms') && (
+          {mobileSectionTab === 'terms' && (
             <section className="pt-3 border-t border-slate-200">
               <PackageTermsDisplay terms={packageTerms} packageName={pkg?.name || selectedProject.packageName} showHeader={false} />
             </section>
           )}
 
-          {(mobileSectionTab === 'all' || mobileSectionTab === 'workflow') && (
+          {mobileSectionTab === 'workflow' && (
             <section className="pt-3 border-t border-slate-200">
               <WorkflowDisplay workflows={workflows} projectName={selectedProject.projectName} showHeader={false} />
             </section>
@@ -1406,7 +1405,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           )}
 
           {/* ──────────── SEKSI 3: FILE & TAUTAN PENTING ───────────── */}
-          {(mobileSectionTab === 'all' || mobileSectionTab === 'files') && (
+          {mobileSectionTab === 'files' && (
             <div className="space-y-3.5 pt-3 border-t border-slate-200">
               <SectionHeading title="File & Tautan Penting" action={sectionEditButton('files')} />
               <SectionCard>
