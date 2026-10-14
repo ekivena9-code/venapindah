@@ -1,6 +1,7 @@
 import React from 'react';
 import { Project, Profile, TeamMember, Client, Package, TeamProjectPayment, Transaction, Card, AssignedTeamMember, PaymentStatus, SubStatusConfig } from '../../../types';
 import { PencilIcon, Share2Icon, CheckCircleIcon, ClipboardListIcon, FileTextIcon } from '../../../constants';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
@@ -19,12 +20,13 @@ interface ProjectDetailViewProps {
 }
 
 const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({ project, profile, teamMembers, clients, packages, onEdit, onShareBriefing, onUpdateStatus, onToggleSubStatus }) => {
+    const uiTextOverrides = useUiTextOverrides();
     return (
         <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <section className="space-y-4">
                     <h4 className="text-lg font-bold text-brand-text-light flex items-center gap-2">
-                        <ClipboardListIcon className="w-5 h-5 text-brand-accent" /> Detail Acara
+                        <ClipboardListIcon className="w-5 h-5 text-brand-accent" /> {customizeUiText('project.detail.title', 'Detail Acara', uiTextOverrides)}
                     </h4>
                     <div className="p-6 rounded-2xl bg-white border border-brand-border shadow-sm space-y-5 text-sm">
                         <div className="flex justify-between items-center py-3 border-b border-slate-100">

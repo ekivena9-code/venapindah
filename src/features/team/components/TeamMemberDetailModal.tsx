@@ -27,6 +27,7 @@ import {
 import { dedupeCurrentTeamPayments, formatCurrency, formatDate } from '../utils/teamUtils';
 import { StarIcon, FileTextIcon, HistoryIcon, Share2Icon } from '../../../constants';
 import { Phone, Mail, CreditCard, ChevronDown, Pencil, Trash2, Save, X } from 'lucide-react';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 // ─── Local types ──────────────────────────────────────────────────────────────
 
@@ -330,7 +331,9 @@ const PaymentsTabContent: React.FC<{
                           </p>
                           <p className="mt-0.5 text-[10px] text-slate-500">
                             {payment
-                              ? `${payment.role || 'Tim / Vendor'} · ${formatDate(payment.date)} · ${payment.status === 'Paid' ? 'Lunas' : 'Belum lunas'}`
+                              ? `${payment.role || 'Tim / Vendor'} · ${formatDate(payment.date)} · ${payment.status === 'Paid'
+                                ? customizeUiText('status.team.paid', 'Lunas', uiTextOverrides)
+                                : customizeUiText('status.team.unpaid', 'Belum lunas', uiTextOverrides)}`
                               : 'Rincian fee acara tidak tersedia'}
                           </p>
                         </div>
@@ -394,6 +397,7 @@ const TeamMemberDetailModal: React.FC<TeamMemberDetailModalProps> = ({
   onSign,
   onOpenQrModal,
 }) => {
+  const uiTextOverrides = useUiTextOverrides();
   const memberPaymentRecords = useMemo(
     () => teamPaymentRecords.filter((r) => r.teamMemberId === selectedMember.id),
     [teamPaymentRecords, selectedMember.id],
@@ -495,26 +499,26 @@ const TeamMemberDetailModal: React.FC<TeamMemberDetailModalProps> = ({
         {/* ── Snapshot stats row ──────────────────────────────────────────── */}
         <div className="grid grid-cols-3 divide-x divide-brand-border bg-brand-bg border border-brand-border rounded-lg sm:rounded-2xl overflow-hidden">
           <SnapshotStat
-            label="Acara Selesai"
+            label={customizeUiText('team.detail.stat.completed', 'Acara Selesai', uiTextOverrides)}
             value={totalPaidEvents}
-            sub="Sudah dibayar"
+            sub={customizeUiText('team.detail.stat.paid', 'Sudah dibayar', uiTextOverrides)}
           />
           <SnapshotStat
-            label="Total Pendapatan"
+            label={customizeUiText('team.detail.stat.income', 'Total Pendapatan', uiTextOverrides)}
             value={
               <span className="text-base font-black">{formatCurrency(totalEarnings)}</span>
             }
-            sub="Lifetime"
+            sub={customizeUiText('team.detail.stat.lifetime', 'Lifetime', uiTextOverrides)}
           />
           <SnapshotStat
-            label="Rating"
+            label={customizeUiText('team.detail.stat.rating', 'Rating', uiTextOverrides)}
             value={
               <span className="inline-flex items-center gap-1 justify-center">
                 {selectedMember.rating.toFixed(1)}
                 <StarIcon className="w-4 h-4 text-yellow-400 fill-current" />
               </span>
             }
-            sub="dari 5"
+            sub={customizeUiText('team.detail.stat.ratingScale', 'dari 5', uiTextOverrides)}
           />
         </div>
 
@@ -524,26 +528,26 @@ const TeamMemberDetailModal: React.FC<TeamMemberDetailModalProps> = ({
             active={isProjectsActive}
             onClick={() => setDetailTab('projects')}
             icon={<FileTextIcon className="w-3.5 h-3.5 shrink-0" />}
-            label="Acara"
+            label={customizeUiText('team.detail.tab.projects', 'Acara', uiTextOverrides)}
             badge={selectedMemberUnpaidProjects.length}
           />
           <TabBtn
             active={detailTab === 'payments'}
             onClick={() => setDetailTab('payments')}
             icon={<HistoryIcon className="w-3.5 h-3.5 shrink-0" />}
-            label="Pembayaran"
+            label={customizeUiText('team.detail.tab.payments', 'Pembayaran', uiTextOverrides)}
           />
           <TabBtn
             active={detailTab === 'performance'}
             onClick={() => setDetailTab('performance')}
             icon={<StarIcon className="w-3.5 h-3.5 shrink-0" />}
-            label="Kinerja"
+            label={customizeUiText('team.detail.tab.performance', 'Kinerja', uiTextOverrides)}
           />
           <TabBtn
             active={false}
             onClick={() => onOpenQrModal(selectedMember)}
             icon={<Share2Icon className="w-3.5 h-3.5 shrink-0" />}
-            label="Portal"
+            label={customizeUiText('team.detail.tab.portal', 'Portal', uiTextOverrides)}
           />
         </div>
 

@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Eye, EyeOff, Copy, Monitor, UploadCloud, LoaderCircle } from 'lucide-react';
+import { Eye, EyeOff, Copy, Monitor, UploadCloud, LoaderCircle, DatabaseBackup } from 'lucide-react';
 import { Profile, Transaction, Project, User, ViewType, ProjectStatusConfig, SubStatusConfig, Package, ChatTemplate, ChecklistTemplate } from '../../types';
 
 import Modal from '../../shared/ui/Modal';
 import ToggleSwitch from '../../shared/ui/ToggleSwitch';
 import CategoryManager from './components/CategoryManager';
+import BackupDataPanel from './components/BackupDataPanel';
+import UiTextCustomizationPanel from './components/UiTextCustomizationPanel';
 import { PencilIcon, PlusIcon, Trash2Icon, KeyIcon, UsersIcon, ListIcon, FolderKanbanIcon, FileTextIcon, SettingsIcon, MessageSquareIcon, RefreshCwIcon, NAV_ITEMS, DEFAULT_INCOME_CATEGORIES, DEFAULT_EXPENSE_CATEGORIES, DEFAULT_PROJECT_TYPES, DEFAULT_EVENT_TYPES, DEFAULT_PACKAGE_CATEGORIES, DEFAULT_PROJECT_STATUS_SUGGESTIONS, DEFAULT_BRIEFING_TEMPLATE, DEFAULT_TERMS_AND_CONDITIONS, DEFAULT_PACKAGE_SHARE_TEMPLATE, DEFAULT_BOOKING_FORM_TEMPLATE, CHAT_TEMPLATES, DEFAULT_BILLING_TEMPLATES, DEFAULT_INVOICE_SHARE_TEMPLATE, DEFAULT_RECEIPT_SHARE_TEMPLATE, DEFAULT_EXPENSE_SHARE_TEMPLATE, DEFAULT_PORTAL_SHARE_TEMPLATE } from '../../constants';
 import { upsertProfile } from '../../services/profile';
 import { updatePackage } from '../../services/packages';
@@ -1988,8 +1990,10 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile, transactions, 
         { id: 'profile', label: 'Profil Saya', icon: UsersIcon, adminOnly: false },
         { id: 'users', label: 'Pengguna', icon: KeyIcon, adminOnly: true },
         { id: 'categories', label: 'Kustomisasi Kategori', icon: ListIcon, adminOnly: false },
+        { id: 'uiText', label: 'Kustomisasi Teks', icon: FileTextIcon, adminOnly: false },
         { id: 'projectStatus', label: 'Progres Acara Pernikahan Pengantin', icon: FolderKanbanIcon, adminOnly: true },
         { id: 'checklistTemplate', label: 'Template Checklist Hari H', icon: FileTextIcon, adminOnly: false },
+        { id: 'backup', label: 'Backup Data', icon: DatabaseBackup, adminOnly: true },
     ];
 
     const renderTabContent = () => {
@@ -2368,6 +2372,8 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile, transactions, 
                         />
                     </div>
                 );
+            case 'uiText':
+                return <UiTextCustomizationPanel />;
             case 'projectStatus':
                 if (currentUser?.role !== 'Admin') return <p className="text-sm md:text-base text-brand-text-secondary">Anda tidak memiliki akses ke halaman ini.</p>;
                 return (
@@ -2391,6 +2397,9 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile, transactions, 
                         }}
                     />
                 );
+            case 'backup':
+                if (currentUser?.role !== 'Admin') return <p className="text-sm md:text-base text-brand-text-secondary">Anda tidak memiliki akses ke halaman ini.</p>;
+                return <BackupDataPanel />;
             default:
                 return null;
         }

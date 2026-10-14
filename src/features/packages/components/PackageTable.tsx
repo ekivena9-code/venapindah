@@ -13,6 +13,7 @@ import {
     Tag,
     Package as PackageIcon
 } from 'lucide-react';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 interface PackageTableProps {
     packages: Package[];
@@ -37,6 +38,8 @@ export const PackageTable: React.FC<PackageTableProps> = ({
     onDelete,
     onShare,
 }) => {
+    const uiTextOverrides = useUiTextOverrides();
+    const text = (key: string, fallback: string) => customizeUiText(`packages.table.${key}`, fallback, uiTextOverrides);
     return (
         <div className="bg-white rounded-2xl border border-[#EAEFF4] shadow-[0_4px_16px_rgba(0,0,0,0.03)] overflow-hidden">
             <div className="overflow-x-auto">
@@ -47,22 +50,22 @@ export const PackageTable: React.FC<PackageTableProps> = ({
                                 No
                             </th>
                             <th className="py-3.5 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5A6A85]">
-                                Nama Paket
+                                {text('name', 'Nama Paket')}
                             </th>
                             <th className="py-3.5 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5A6A85]">
-                                Kategori
+                                {text('category', 'Kategori')}
                             </th>
                             <th className="py-3.5 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5A6A85]">
-                                Wilayah
+                                {text('region', 'Wilayah')}
                             </th>
                             <th className="py-3.5 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5A6A85]">
-                                Harga / Variasi
+                                {text('price', 'Harga / Variasi')}
                             </th>
                             <th className="py-3.5 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5A6A85]">
-                                Tim Dokumentasi
+                                {text('team', 'Tim Dokumentasi')}
                             </th>
                             <th className="py-3.5 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5A6A85] text-right">
-                                Aksi
+                                {text('actions', 'Aksi')}
                             </th>
                         </tr>
                     </thead>
@@ -73,8 +76,8 @@ export const PackageTable: React.FC<PackageTableProps> = ({
                                     <div className="w-14 h-14 rounded-2xl bg-[#F4F6F9] border border-[#EAEFF4] flex items-center justify-center mx-auto mb-3 text-[#5A6A85]">
                                         <PackageIcon className="w-7 h-7 opacity-50" />
                                     </div>
-                                    <p className="text-sm font-semibold text-[#2A3547]">Tidak ada paket yang ditemukan.</p>
-                                    <p className="text-xs text-[#5A6A85] mt-1">Coba sesuaikan kata kunci pencarian atau filter wilayah.</p>
+                                    <p className="text-sm font-semibold text-[#2A3547]">{customizeUiText('packages.catalog.empty', 'Tidak ada paket yang ditemukan.', uiTextOverrides)}</p>
+                                    <p className="text-xs text-[#5A6A85] mt-1">{customizeUiText('packages.catalog.emptyHint', 'Coba sesuaikan kata kunci pencarian atau filter wilayah.', uiTextOverrides)}</p>
                                 </td>
                             </tr>
                         ) : (

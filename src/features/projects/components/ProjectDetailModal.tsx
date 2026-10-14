@@ -32,6 +32,7 @@ import { getPackageTerms } from '../../packages/packageTerms';
 import PackageTermsDisplay from '../../packages/components/PackageTermsDisplay';
 import WorkflowDisplay from '../../packages/components/WorkflowDisplay';
 import { getWorkflows } from '../../packages/workflows';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 export interface ProjectDetailModalProps {
   selectedProject: Project | null;
@@ -118,6 +119,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   onEditSubStatusToggle,
   sectionEditingEnabled = false,
 }) => {
+  const uiTextOverrides = useUiTextOverrides();
   // ── state ───────────────────────────────────────────────────────────────
   const [isEditingFinalLink, setIsEditingFinalLink] = useState(false);
   const [editingSection, setEditingSection] = useState<ProjectEditSection | null>(null);
@@ -753,13 +755,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
           <div className="sticky top-0 z-20 -mx-1 px-1 py-1.5 bg-white/95 backdrop-blur-md border-b border-slate-200">
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
               {([
-                { id: 'all', label: 'Semua' },
-                { id: 'info', label: 'Info & Status' },
-                { id: 'meetings', label: 'Meeting' },
-                { id: 'team', label: `Tim & Paket (${selectedProject.team?.length || 0})` },
-                { id: 'terms', label: 'Syarat & Ketentuan' },
-                { id: 'workflow', label: 'Workflow' },
-                { id: 'files', label: 'File & Link' },
+                { id: 'all', label: customizeUiText('project.detail.tab.all', 'Semua', uiTextOverrides) },
+                { id: 'info', label: customizeUiText('project.detail.tab.info', 'Info & Status', uiTextOverrides) },
+                { id: 'meetings', label: customizeUiText('project.detail.tab.meetings', 'Meeting', uiTextOverrides) },
+                { id: 'team', label: `${customizeUiText('project.detail.tab.team', 'Tim & Paket', uiTextOverrides)} (${selectedProject.team?.length || 0})` },
+                { id: 'terms', label: customizeUiText('project.detail.tab.terms', 'Syarat & Ketentuan', uiTextOverrides) },
+                { id: 'workflow', label: customizeUiText('project.detail.tab.workflow', 'Workflow', uiTextOverrides) },
+                { id: 'files', label: customizeUiText('project.detail.tab.files', 'File & Link', uiTextOverrides) },
               ] as const).map(tab => {
                 const active = mobileSectionTab === tab.id;
                 return (
@@ -786,12 +788,12 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               {(mobileSectionTab === 'all' || mobileSectionTab === 'info') && (
                 <>
               <section>
-                <SectionHeading title="Informasi Utama" action={sectionEditButton('info')} />
+                <SectionHeading title={customizeUiText('project.detail.section.main', 'Informasi Utama', uiTextOverrides)} action={sectionEditButton('info')} />
                 <SectionCard>
                   <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5">
-                    <InfoField label="Pengantin">{selectedProject.clientName}</InfoField>
-                    <InfoField label="Lokasi / Kota">{selectedProject.location || '—'}</InfoField>
-                    <InfoField label="Tanggal Acara" className="col-span-2 sm:col-span-1">
+                    <InfoField label={customizeUiText('project.detail.field.client', 'Pengantin', uiTextOverrides)}>{selectedProject.clientName}</InfoField>
+                    <InfoField label={customizeUiText('project.detail.field.location', 'Lokasi / Kota', uiTextOverrides)}>{selectedProject.location || '—'}</InfoField>
+                    <InfoField label={customizeUiText('project.detail.field.date', 'Tanggal Acara', uiTextOverrides)} className="col-span-2 sm:col-span-1">
                       {formatDateFull(selectedProject.date)}
                     </InfoField>
                     <InfoField label="Alamat Lengkap / Gedung" className="col-span-2 sm:col-span-1">
@@ -812,7 +814,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               </section>
 
               <section>
-                <SectionHeading title="Status & Progres Pengerjaan" action={sectionEditButton('status')} />
+                <SectionHeading title={customizeUiText('project.detail.section.status', 'Status & Progres Pengerjaan', uiTextOverrides)} action={sectionEditButton('status')} />
                 <SectionCard>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-4">
                     <p className="text-[11px] sm:text-xs font-bold text-[#5A6A85] uppercase tracking-wider shrink-0">
@@ -885,7 +887,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               </section>
 
               <section>
-                  <SectionHeading title="Catatan Khusus" action={sectionEditButton('notes')} />
+                  <SectionHeading title={customizeUiText('project.detail.section.notes', 'Catatan Khusus', uiTextOverrides)} action={sectionEditButton('notes')} />
                   <SectionCard>
                     <p className="text-xs sm:text-sm text-[#2A3547] leading-relaxed whitespace-pre-line">
                       {selectedProject.notes || <span className="italic text-[#5A6A85]">Belum ada catatan.</span>}
@@ -897,11 +899,11 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
               {(mobileSectionTab === 'all' || mobileSectionTab === 'meetings') && (
               <section>
-                <SectionHeading title="Jadwal Meeting & Hasil" />
+                <SectionHeading title={customizeUiText('project.detail.section.meetings', 'Jadwal Meeting & Hasil', uiTextOverrides)} />
                 <div className="grid grid-cols-1 gap-3">
                   {([
-                    { kind: 'regular', title: 'Meeting Offline', description: 'Atur pertemuan langsung dengan pengantin.', icon: CalendarClock },
-                    { kind: 'zoom', title: 'Meeting Online', description: 'Atur meeting online dan simpan tautan Zoom.', icon: Video },
+                    { kind: 'regular', title: customizeUiText('project.detail.meeting.offline', 'Meeting Offline', uiTextOverrides), description: 'Atur pertemuan langsung dengan pengantin.', icon: CalendarClock },
+                    { kind: 'zoom', title: customizeUiText('project.detail.meeting.online', 'Meeting Online', uiTextOverrides), description: 'Atur meeting online dan simpan tautan Zoom.', icon: Video },
                   ] as const).map(({ kind, title, description, icon: MeetingIcon }) => {
                     const draft = meetingDrafts[kind];
                     const meeting = projectMeetings.find(item => item.metadata.kind === kind);

@@ -20,6 +20,7 @@ import {
     DollarSign,
     Box
 } from 'lucide-react';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 interface PackageModalProps {
     isOpen: boolean;
@@ -48,6 +49,8 @@ export const PackageModal: React.FC<PackageModalProps> = ({
     onSubmit,
     onCoverImageUpload,
 }) => {
+    const uiTextOverrides = useUiTextOverrides();
+    const text = (key: string, fallback: string) => customizeUiText(`packages.form.${key}`, fallback, uiTextOverrides);
     const [activeTab, setActiveTab] = useState<'basic' | 'duration' | 'deliverables' | 'cover'>('basic');
     const [expandedDurationIdx, setExpandedDurationIdx] = useState<number | null>(null);
 
@@ -156,7 +159,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={editMode === 'new' ? 'Tambah Paket Baru' : 'Edit Paket Layanan'}
+            title={editMode === 'new' ? text('title.create', 'Tambah Paket Baru') : text('title.edit', 'Edit Paket Layanan')}
             size="3xl"
         >
             <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6">
@@ -172,7 +175,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                         }`}
                     >
                         <Info className="w-4 h-4" />
-                        <span>Informasi & Harga</span>
+                        <span>{text('tab.basic', 'Informasi & Harga')}</span>
                     </button>
 
                     <button
@@ -185,7 +188,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                         }`}
                     >
                         <Clock className="w-4 h-4" />
-                        <span>Opsi Durasi</span>
+                        <span>{text('tab.duration', 'Opsi Durasi')}</span>
                         {formData.durationOptions?.filter((o: any) => o.label?.trim()).length > 0 && (
                             <span className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full text-[10px] flex items-center justify-center font-bold ${
                                 activeTab === 'duration' ? 'bg-white text-[#5D87FF]' : 'bg-[#5D87FF] text-white'
@@ -205,7 +208,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                         }`}
                     >
                         <CheckSquare className="w-4 h-4" />
-                        <span>Deliverables & Item</span>
+                        <span>{text('tab.deliverables', 'Deliverables & Item')}</span>
                         {formData.digitalItems?.filter((d: string) => d.trim()).length > 0 && (
                             <span className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full text-[10px] flex items-center justify-center font-bold ${
                                 activeTab === 'deliverables' ? 'bg-white text-[#13DEB9]' : 'bg-[#13DEB9] text-white'
@@ -225,7 +228,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                         }`}
                     >
                         <ImageIcon className="w-4 h-4" />
-                        <span>Foto Sampul</span>
+                        <span>{text('tab.cover', 'Foto Sampul')}</span>
                         {formData.coverImage && (
                             <span className="w-2 h-2 rounded-full bg-[#13DEB9]" />
                         )}
@@ -240,7 +243,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-[#2A3547] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
                                     <PackageIcon className="w-3.5 h-3.5 text-[#5D87FF]" />
-                                    <span>Nama Paket</span> <span className="text-rose-500">*</span>
+                                    <span>{text('field.name', 'Nama Paket')}</span> <span className="text-rose-500">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -256,7 +259,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                             <div>
                                 <label className="block text-xs font-bold text-[#2A3547] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
                                     <Tag className="w-3.5 h-3.5 text-[#5D87FF]" />
-                                    <span>Kategori Layanan</span> <span className="text-rose-500">*</span>
+                                    <span>{text('field.category', 'Kategori Layanan')}</span> <span className="text-rose-500">*</span>
                                 </label>
                                 <select
                                     required
@@ -275,7 +278,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                             <div>
                                 <label className="block text-xs font-bold text-[#2A3547] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
                                     <DollarSign className="w-3.5 h-3.5 text-[#5D87FF]" />
-                                    <span>Harga Paket (IDR)</span> {!hasDurationOptions && <span className="text-rose-500">*</span>}
+                                    <span>{text('field.price', 'Harga Paket (IDR)')}</span> {!hasDurationOptions && <span className="text-rose-500">*</span>}
                                 </label>
                                 {hasDurationOptions ? (
                                     <div className="px-3.5 py-2.5 rounded-xl border border-[#EAEFF4] bg-[#F4F6F9] text-xs text-[#5A6A85] flex items-center justify-between">
@@ -298,7 +301,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-[#2A3547] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
                                     <Users className="w-3.5 h-3.5 text-[#5D87FF]" />
-                                    Tim Dokumentasi
+                                    {text('field.team', 'Tim Dokumentasi')}
                                 </label>
                                 <input
                                     type="text"
@@ -313,7 +316,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-bold text-[#2A3547] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
                                     <MapPin className="w-3.5 h-3.5 text-[#5D87FF]" />
-                                    Wilayah Operasional (Opsional)
+                                    {text('field.region', 'Wilayah Operasional (Opsional)')}
                                 </label>
                                 <input
                                     type="text"
@@ -401,7 +404,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                                                     onChange={() => handleDurationChange(index, 'default', true)}
                                                     className="text-[#5D87FF] focus:ring-0 cursor-pointer"
                                                 />
-                                                <span>Default</span>
+                                                <span>{text('duration.default', 'Default')}</span>
                                             </label>
 
                                             <button
@@ -451,7 +454,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                             className="w-full py-2.5 border-2 border-dashed border-[#5D87FF]/30 hover:border-[#5D87FF] rounded-xl text-[#5D87FF] font-semibold text-xs transition-colors flex items-center justify-center gap-1.5"
                         >
                             <Plus className="w-4 h-4" />
-                            <span>Tambah Opsi Durasi Baru</span>
+                            <span>{text('duration.add', 'Tambah Opsi Durasi Baru')}</span>
                         </button>
                     </div>
                 )}
@@ -462,7 +465,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                         {/* Digital Deliverables */}
                         <div className="space-y-3">
                             <div>
-                                <h4 className="font-bold text-sm text-[#2A3547]">Deliverables & Layanan Digital</h4>
+                                    <h4 className="font-bold text-sm text-[#2A3547]">{text('deliverables.title', 'Deliverables & Layanan Digital')}</h4>
                                 <p className="text-xs text-[#5A6A85] mt-0.5">
                                     Daftar file atau hasil akhir yang akan diterima pengantin.{' '}
                                     <span className="text-[#13DEB9] font-medium">Satu baris = satu item.</span>
@@ -484,7 +487,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                         <div className="pt-4 border-t border-[#EAEFF4] space-y-3">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h4 className="font-bold text-sm text-[#2A3547]">Vendor / Allpackage & Fisik</h4>
+                                    <h4 className="font-bold text-sm text-[#2A3547]">{text('physical.title', 'Vendor / Allpackage & Fisik')}</h4>
                                     <p className="text-xs text-[#5A6A85]">Item cetak fisik, album, atau vendor rekanan jika paket all-in.</p>
                                 </div>
                                 <button
@@ -563,7 +566,7 @@ export const PackageModal: React.FC<PackageModalProps> = ({
                                         <ImageIcon className="w-8 h-8" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm text-[#2A3547]">Unggah Foto Sampul Paket</p>
+                                        <p className="font-bold text-sm text-[#2A3547]">{text('cover.upload', 'Unggah Foto Sampul Paket')}</p>
                                         <p className="text-xs text-[#5A6A85] mt-1">
                                             Pilih gambar portrait/landscape menarik berukuran maksimal 2MB.
                                         </p>

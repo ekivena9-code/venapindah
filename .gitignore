@@ -73,3 +73,4 @@ backups/
 !supabase/migrations/20261008090000_allow_projects_without_event_date.sql
 !supabase/migrations/20261008140000_add_vendor_profile_page_banner.sql
 !supabase/migrations/20261008150000_grant_bio_link_page_access.sql
+!supabase/migrations/20261014120000_ui_text_overrides.sql

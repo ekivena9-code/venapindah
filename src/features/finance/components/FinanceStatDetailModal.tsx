@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardType, FinancialPocket, Transaction } from '../../../types';
 import Modal from '../../../shared/ui/Modal';
 import { formatCurrency } from '../../../utils/currency';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 interface FinanceStatDetailModalProps {
     activeStatModal: string | null;
@@ -27,13 +28,19 @@ const FinanceStatDetailModal: React.FC<FinanceStatDetailModalProps> = ({
     thisMonthIncome,
     thisMonthExpense
 }) => {
+    const uiTextOverrides = useUiTextOverrides();
     if (!activeStatModal) return null;
+    const title = customizeUiText(
+        `finance.detail.${activeStatModal}.title`,
+        statModalTitles[activeStatModal] || '',
+        uiTextOverrides,
+    );
 
     return (
         <Modal
             isOpen={!!activeStatModal}
             onClose={onClose}
-            title={statModalTitles[activeStatModal] || ''}
+            title={title}
             size="2xl"
         >
             <div className="max-h-[60vh] overflow-y-auto pr-2">
@@ -72,7 +79,7 @@ const FinanceStatDetailModal: React.FC<FinanceStatDetailModalProps> = ({
                                 </div>
                             ))
                         ) : (
-                            <p className="text-center text-brand-text-secondary py-8">Tidak ada pemasukan bulan ini.</p>
+                            <p className="text-center text-brand-text-secondary py-8">{customizeUiText('finance.detail.income.empty', 'Tidak ada pemasukan bulan ini.', uiTextOverrides)}</p>
                         )}
                     </div>
                 )}
@@ -89,7 +96,7 @@ const FinanceStatDetailModal: React.FC<FinanceStatDetailModalProps> = ({
                                 </div>
                             ))
                         ) : (
-                            <p className="text-center text-brand-text-secondary py-8">Tidak ada pengeluaran bulan ini.</p>
+                            <p className="text-center text-brand-text-secondary py-8">{customizeUiText('finance.detail.expense.empty', 'Tidak ada pengeluaran bulan ini.', uiTextOverrides)}</p>
                         )}
                     </div>
                 )}

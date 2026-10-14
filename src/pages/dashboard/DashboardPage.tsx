@@ -7,6 +7,7 @@ import Modal from '../../shared/ui/Modal';
 import { NAV_ITEMS, DollarSignIcon, FolderKanbanIcon, UsersIcon, BriefcaseIcon, ChevronRightIcon, CreditCardIcon, CalendarIcon, ClipboardListIcon, LightbulbIcon, TargetIcon, StarIcon, CameraIcon, FileTextIcon, TrendingUpIcon, AlertCircleIcon, MapPinIcon, ClockIcon } from '../../constants';
 import { Breadcrumb, ModernStatCard, ModernBadge } from '../../components/modernize';
 import { MobileCollapsibleSection } from '../../components/ui/MobileProgressiveDisclosure';
+import { customizeNavigationLabel, customizeUiText, useUiTextOverrides } from '../../utils/uiTextCustomization';
 
 // Helper Functions
 const formatCurrency = (amount: number, minimumFractionDigits = 0) => {
@@ -35,6 +36,7 @@ const getStatusClass = (status: string, config: ProjectStatusConfig[]) => {
 // --- Sub-components for Dashboard ---
 
 const QuickLinksWidget: React.FC<{ handleNavigation: (view: ViewType) => void; currentUser: User | null; }> = ({ handleNavigation, currentUser }) => {
+    const uiTextOverrides = useUiTextOverrides();
     const quickLinks = useMemo(() => {
         const allLinks = NAV_ITEMS.filter(item => item.view !== ViewType.DASHBOARD);
         if (!currentUser || currentUser.role === 'Admin') {
@@ -54,10 +56,10 @@ const QuickLinksWidget: React.FC<{ handleNavigation: (view: ViewType) => void; c
                         key={link.view}
                         onClick={() => handleNavigation(link.view)}
                         className="flex flex-col items-center justify-center p-3 md:p-4 bg-[#F4F6F9] rounded-xl text-center hover:bg-[#ECF2FF] hover:border-[#5D87FF]/25 border border-transparent hover:shadow-xs transition-all duration-200 active:scale-95"
-                        aria-label={`Buka ${link.label}`}
+                        aria-label={`Buka ${customizeNavigationLabel(link.label, uiTextOverrides)}`}
                     >
                         <link.icon className="w-6 h-6 md:w-7 md:h-7 text-[#5D87FF] mb-1.5 md:mb-2" />
-                        <span className="text-[11px] md:text-xs font-semibold text-[#2A3547]">{link.label}</span>
+                        <span className="text-[11px] md:text-xs font-semibold text-[#2A3547]">{customizeNavigationLabel(link.label, uiTextOverrides)}</span>
                     </button>
                 ))}
             </div>
@@ -844,6 +846,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     profile,
     totals,
 }) => {
+    const uiTextOverrides = useUiTextOverrides();
     const [activeModal, setActiveModal] = useState<'balance' | 'projects' | 'clients' | 'teamMembers' | 'payments' | null>(null);
     const safeTotals = totals ?? EMPTY_DASHBOARD_TOTALS;
 
@@ -903,10 +906,11 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-white p-3.5 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl border border-[#EAEFF4] shadow-[0_9px_17.5px_rgba(0,0,0,0.05)]">
                 <div>
                     <h1 className="text-base sm:text-2xl font-extrabold text-[#2A3547] tracking-tight">
-                        {profile.companyName || 'Studio'} Dashboard
+                        {customizeUiText('dashboard.title', '{companyName} Dashboard', uiTextOverrides)
+                            .replaceAll('{companyName}', profile.companyName || 'Studio')}
                     </h1>
                     <p className="text-[11px] sm:text-sm text-[#5A6A85] mt-0.5 sm:mt-1">
-                        Pusat kendali operasional, agenda pernikahan, dan kesehatan finansial studio.
+                        {customizeUiText('dashboard.subtitle', 'Pusat kendali operasional, agenda pernikahan, dan kesehatan finansial studio.', uiTextOverrides)}
                     </p>
                 </div>
                 <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto">

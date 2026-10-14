@@ -16,6 +16,7 @@ import { updateProject as updateProjectRow } from '../../../services/projects';
 import { formatCurrency, normalizeTerminology } from '../utils/clientHelpers';
 import { useExtraChargeTemplates } from '../../../hooks/useExtraChargeTemplates';
 import ManageTemplatesModal from './ManageTemplatesModal';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 const ProjectManagement = lazy(() =>
   import('../../../pages/projects/ProjectsPage').then(module => ({ default: module.Projects })),
@@ -145,6 +146,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
   showNotification, setProjects, setTransactions, setCards,
   teamMembers, teamProjectPayments, setTeamProjectPayments, pockets, setPockets,
 }) => {
+  const uiTextOverrides = useUiTextOverrides();
   const [activeTab, setActiveTab] = useState<'info' | 'events' | 'payments'>(() =>
     projects.some(project => project.clientId === client.id) ? 'events' : 'info',
   );
@@ -394,14 +396,14 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-200 uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-            Lunas
+            {customizeUiText('status.client.paid', 'Lunas', uiTextOverrides)}
           </span>
         );
       case PaymentStatus.DP_TERBAYAR:
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200 uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
-            DP Terbayar
+            {customizeUiText('status.client.deposit', 'DP Terbayar', uiTextOverrides)}
           </span>
         );
       case PaymentStatus.BELUM_BAYAR:
@@ -409,7 +411,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-50 text-red-700 text-[10px] font-bold border border-red-200 uppercase tracking-wider">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
-            Belum Bayar
+            {customizeUiText('status.client.unpaid', 'Belum Bayar', uiTextOverrides)}
           </span>
         );
     }
@@ -418,9 +420,9 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
   // ── tab config ────────────────────────────────────────────────────────────
 
   const tabs: { key: 'info' | 'events' | 'payments'; label: string; icon: React.ReactNode }[] = [
-    { key: 'info', label: 'Informasi', icon: <UsersIcon className="w-4 h-4" /> },
-    { key: 'events', label: `Acara Pernikahan (${totalProjects})`, icon: <FolderKanbanIcon className="w-4 h-4" /> },
-    { key: 'payments', label: 'Pembayaran & Transaksi', icon: <HistoryIcon className="w-4 h-4" /> },
+    { key: 'info', label: customizeUiText('client.detail.tab.info', 'Informasi', uiTextOverrides), icon: <UsersIcon className="w-4 h-4" /> },
+    { key: 'events', label: `${customizeUiText('client.detail.tab.events', 'Acara Pernikahan', uiTextOverrides)} (${totalProjects})`, icon: <FolderKanbanIcon className="w-4 h-4" /> },
+    { key: 'payments', label: customizeUiText('client.detail.tab.payments', 'Pembayaran & Transaksi', uiTextOverrides), icon: <HistoryIcon className="w-4 h-4" /> },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -455,7 +457,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
           {/* Name + meta */}
           <div className="flex w-full min-w-0 flex-1 flex-col items-center gap-3 text-center sm:items-start sm:text-left">
             <div className="w-full">
-              <p className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-widest text-blue-100/80 mb-0.5">Detail Pengantin</p>
+              <p className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-widest text-blue-100/80 mb-0.5">{customizeUiText('client.detail.title', 'Detail Pengantin', uiTextOverrides)}</p>
               <h2 className="text-base sm:text-2xl font-black text-white leading-tight break-words">{client.name}</h2>
               <div className="mt-1 flex flex-wrap justify-center gap-1.5 sm:justify-start sm:gap-2">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-white/15 text-white text-[9px] sm:text-[10px] font-semibold border border-white/20">
@@ -473,18 +475,18 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
               <button
                 onClick={() => onEditClient(client)}
                 className="h-7 sm:h-9 px-2 inline-flex items-center justify-center gap-1.5 rounded-lg sm:rounded-xl bg-[#5D87FF]/30 hover:bg-[#5D87FF]/45 border border-blue-200/40 text-blue-100 text-[9px] sm:text-xs font-semibold whitespace-nowrap transition-all active:scale-90"
-                title="Edit Pengantin"
+                title={customizeUiText('client.detail.action.edit', 'Edit Pengantin', uiTextOverrides)}
               >
                 <PencilIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>Edit Pengantin</span>
+                <span>{customizeUiText('client.detail.action.edit', 'Edit Pengantin', uiTextOverrides)}</span>
               </button>
               <button
                 onClick={() => onSharePortal(client)}
                 className="h-7 sm:h-9 px-2 inline-flex items-center justify-center gap-1.5 rounded-lg sm:rounded-xl bg-emerald-600 border border-emerald-700 text-white text-[9px] sm:text-xs font-semibold whitespace-nowrap transition-all active:scale-90"
-                title="Bagikan Portal"
+                title={customizeUiText('client.detail.action.share', 'Bagikan Portal', uiTextOverrides)}
               >
                 <Share2Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>Bagikan Portal</span>
+                <span>{customizeUiText('client.detail.action.share', 'Bagikan Portal', uiTextOverrides)}</span>
               </button>
             </div>
           </div>
@@ -520,7 +522,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
             {/* Contact & identity card */}
             <div className="bg-brand-surface rounded-2xl border border-brand-border overflow-hidden shadow-sm">
               <div className="px-4 py-3 border-b border-brand-border bg-brand-bg/60">
-                <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-secondary">Kontak &amp; Identitas</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-brand-text-secondary">{customizeUiText('client.detail.section.contact', 'Kontak & Identitas', uiTextOverrides)}</p>
               </div>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                 <InfoField label="Email">
@@ -560,7 +562,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
             {/* Financial summary cards */}
             <div>
               <SectionTitle sub="Total Package, pembayaran, dan sisa pembayaran pengantin ini">
-                Ringkasan Keuangan
+                {customizeUiText('client.detail.section.finance', 'Ringkasan Keuangan', uiTextOverrides)}
               </SectionTitle>
               <div className="grid grid-cols-2 gap-3">
                 {[
@@ -1173,7 +1175,7 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
                   {/* ── TRANSACTION HISTORY ───────────────────────────── */}
                   <div className="mt-4">
                     <SectionTitle sub="Riwayat pembayaran dan biaya untuk acara ini">
-                      Riwayat Transaksi
+                      {customizeUiText('client.detail.section.transactions', 'Riwayat Transaksi', uiTextOverrides)}
                     </SectionTitle>
 
                     {/* Mobile transaction cards */}

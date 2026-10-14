@@ -16,6 +16,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import { MobileExpandableExtra } from '../../../components/ui/MobileProgressiveDisclosure';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 interface PackageCardProps {
     pkg: Package;
@@ -50,6 +51,8 @@ export const PackageCard: React.FC<PackageCardProps> = ({
     canMoveDown,
     orderIndex,
 }) => {
+    const uiTextOverrides = useUiTextOverrides();
+    const text = (key: string, fallback: string) => customizeUiText(`packages.card.${key}`, fallback, uiTextOverrides);
     // Interactive selected duration option (if duration options exist)
     const [selectedDurationIdx, setSelectedDurationIdx] = useState<number>(() => {
         if (pkg.durationOptions && pkg.durationOptions.length > 0) {
@@ -89,7 +92,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                         <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-white/90 border border-[#EAEFF4] flex items-center justify-center shadow-sm text-[#5A6A85]">
                             <Camera className="w-4 h-4 sm:w-6 sm:h-6 opacity-50" />
                         </div>
-                        <span className="text-[9px] sm:text-[10px] font-medium text-[#5A6A85]/70">Tanpa Foto Sampul</span>
+                        <span className="text-[9px] sm:text-[10px] font-medium text-[#5A6A85]/70">{text('coverEmpty', 'Tanpa Foto Sampul')}</span>
                     </div>
                 )}
                 
@@ -142,7 +145,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                 {/* Price display pinned on bottom-left of cover */}
                 <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-end justify-between gap-2">
                     <div className="min-w-0">
-                        <p className="text-[8px] sm:text-[10px] uppercase font-semibold tracking-wider text-white/80">Investasi</p>
+                        <p className="text-[8px] sm:text-[10px] uppercase font-semibold tracking-wider text-white/80">{text('investment', 'Investasi')}</p>
                         <p className="text-xs sm:text-lg lg:text-xl font-bold text-white drop-shadow-sm leading-tight truncate">
                             {formatCurrency(currentPrice)}
                         </p>
@@ -178,7 +181,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                             <div className="flex items-center justify-between mb-1.25">
                                 <span className="text-[8px] sm:text-[10px] uppercase font-bold tracking-wider text-[#5A6A85] flex items-center gap-1">
                                     <Clock className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-[#5D87FF] flex-shrink-0" />
-                                    <span>Pilihan Durasi</span>
+                                    <span>{text('durationOptions', 'Pilihan Durasi')}</span>
                                 </span>
                                 {activeOption && (
                                     <span className="text-[10px] sm:text-[11px] font-bold text-[#5D87FF]">
@@ -215,7 +218,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                     {currentDigitalItems.length > 0 && (
                         <div className="space-y-1 sm:space-y-1.5">
                             <p className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider text-[#5A6A85]">
-                                Yang Didapatkan
+                                {text('deliverables', 'Yang Didapatkan')}
                             </p>
                             <ul className="space-y-1">
                                 {currentDigitalItems.map((item, idx) => (
@@ -249,15 +252,15 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                 {/* Mobile Progressive Disclosure: Rincian & Aksi */}
                 <div className="sm:hidden mt-auto">
                     <MobileExpandableExtra
-                        labelOpen="Rincian & Aksi"
-                        labelClose="Tutup"
+                        labelOpen={text('detailsOpen', 'Rincian & Aksi')}
+                        labelClose={text('detailsClose', 'Tutup')}
                         headerRight={
                             <button
                                 type="button"
                                 onClick={() => onEdit(pkg)}
                                 className="px-2 py-1 rounded-lg bg-[#ECF2FF] text-[#5D87FF] font-bold text-[10px] inline-flex items-center gap-1"
                             >
-                                <Pencil className="w-3 h-3" /> Edit
+                                <Pencil className="w-3 h-3" /> {text('edit', 'Edit Paket')}
                             </button>
                         }
                     >
@@ -265,7 +268,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                             {pkg.durationOptions && pkg.durationOptions.length > 0 && (
                                 <div className="bg-[#F4F6F9]/80 rounded-lg p-1.5 border border-[#EAEFF4]">
                                     <span className="text-[9px] uppercase font-bold tracking-wider text-[#5A6A85] block mb-1">
-                                        Pilihan Durasi
+                                        {text('durationOptions', 'Pilihan Durasi')}
                                     </span>
                                     <div className="flex flex-wrap gap-1">
                                         {pkg.durationOptions.map((opt, idx) => {
@@ -305,18 +308,18 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                                     type="button"
                                     onClick={() => onDuplicate(pkg)}
                                     className="flex-1 py-1.5 rounded-lg bg-[#F4F6F9] text-[#5A6A85] border border-[#EAEFF4] text-[10px] font-semibold flex items-center justify-center gap-1"
-                                    title="Duplikasi"
+                                    title={text('duplicate', 'Salin')}
                                 >
-                                    <Copy className="w-3 h-3" /> Salin
+                                    <Copy className="w-3 h-3" /> {text('duplicate', 'Salin')}
                                 </button>
                                 {onShare && (
                                     <button
                                         type="button"
                                         onClick={() => onShare(pkg)}
                                         className="flex-1 py-1.5 rounded-lg bg-[#F4F6F9] text-[#5A6A85] border border-[#EAEFF4] text-[10px] font-semibold flex items-center justify-center gap-1"
-                                        title="Bagikan"
+                                        title={text('share', 'Bagikan')}
                                     >
-                                        <Share2 className="w-3 h-3" /> Share
+                                        <Share2 className="w-3 h-3" /> {text('share', 'Bagikan')}
                                     </button>
                                 )}
                                 <button
@@ -338,11 +341,11 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                         type="button"
                         onClick={() => onEdit(pkg)}
                         className="flex-1 min-h-[40px] py-1.5 px-3 rounded-xl bg-[#ECF2FF] hover:bg-[#5D87FF] text-[#5D87FF] hover:text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 group/btn cursor-pointer shadow-xs touch-manipulation"
-                        title="Edit Paket"
-                        aria-label="Edit Paket"
+                        title={text('edit', 'Edit Paket')}
+                        aria-label={text('edit', 'Edit Paket')}
                     >
                         <Pencil className="w-4 h-4 transition-transform group-hover/btn:scale-110 flex-shrink-0" />
-                        <span className="inline">Edit Paket</span>
+                        <span className="inline">{text('edit', 'Edit Paket')}</span>
                     </button>
 
                     <button

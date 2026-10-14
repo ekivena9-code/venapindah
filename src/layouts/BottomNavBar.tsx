@@ -1,6 +1,7 @@
 import React from "react";
 import { LayoutGrid as MoreGridIcon, ChevronDown as ChevronDownIcon, Link as LinkIcon } from "lucide-react";
 import { ViewType } from "../types";
+import { customizeNavigationLabel, useUiTextOverrides } from "../utils/uiTextCustomization";
 import {
   HomeIcon,
   UsersIcon,
@@ -27,6 +28,7 @@ export const MoreMenuSheet: React.FC<{
   activeView: ViewType;
   handleNavigation: (view: ViewType) => void;
 }> = ({ isOpen, onClose, activeView, handleNavigation }) => {
+  const uiTextOverrides = useUiTextOverrides();
   const menuGroups = [
     {
       label: "Manajemen",
@@ -114,7 +116,7 @@ export const MoreMenuSheet: React.FC<{
           {menuGroups.map((group) => (
             <div key={group.label}>
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#5A6A85] px-1 mb-2">
-                {group.label}
+                        {customizeNavigationLabel(group.label, uiTextOverrides)}
               </p>
               <div className="more-menu-grid grid grid-cols-3 gap-2">
                 {group.items.map((item) => {
@@ -136,7 +138,7 @@ export const MoreMenuSheet: React.FC<{
                     >
                       <item.icon className={`more-menu-item-icon w-5 h-5 ${isActive ? "text-white" : "text-[#5D87FF]"}`} />
                       <span className={`more-menu-item-label text-[11px] font-semibold leading-tight text-center ${isActive ? "text-white" : ""}`}>
-                        {item.label}
+                        {customizeNavigationLabel(item.label, uiTextOverrides)}
                       </span>
                     </button>
                   );
@@ -159,6 +161,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   activeView,
   handleNavigation,
 }) => {
+  const uiTextOverrides = useUiTextOverrides();
   const [isMoreOpen, setIsMoreOpen] = React.useState(false);
 
   const prefetchView = (view: ViewType) => {
@@ -270,7 +273,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                   : "text-[#5A6A85] hover:text-[#2A3547] hover:bg-[#F4F6F9] active:bg-[#ECF2FF]"
                 }
               `}
-              aria-label={item.label}
+              aria-label={customizeNavigationLabel(item.label, uiTextOverrides)}
             >
               <div className="relative mb-0.5">
                 <item.icon className={`w-5 h-5 transition-all duration-200 ${activeView === item.view ? "scale-110 text-[#5D87FF]" : "group-active:scale-95"}`} />
@@ -279,7 +282,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
                 )}
               </div>
               <span className={`text-[10px] sm:text-xs font-semibold leading-tight ${activeView === item.view ? "font-bold text-[#5D87FF]" : ""}`}>
-                {item.label}
+                {customizeNavigationLabel(item.label, uiTextOverrides)}
               </span>
             </button>
           ))}

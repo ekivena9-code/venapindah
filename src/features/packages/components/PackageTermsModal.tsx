@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PackageTermItem, Profile } from '../../../types';
 import { DEFAULT_PACKAGE_TERMS } from '../packageTerms';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 import {
     FileText,
     X,
@@ -30,6 +31,8 @@ export const PackageTermsModal: React.FC<PackageTermsModalProps> = ({
     onSaveTerms,
     showNotification,
 }) => {
+    const uiTextOverrides = useUiTextOverrides();
+    const text = (key: string, fallback: string) => customizeUiText(`packages.terms.${key}`, fallback, uiTextOverrides);
     const [terms, setTerms] = useState<PackageTermItem[]>([]);
     const [editingTermId, setEditingTermId] = useState<string | null>(null);
     const [formTitle, setFormTitle] = useState('');
@@ -171,14 +174,14 @@ export const PackageTermsModal: React.FC<PackageTermsModalProps> = ({
                         <div>
                             <div className="flex items-center gap-2">
                                 <h3 className="font-bold text-base sm:text-lg text-[#2A3547]">
-                                    Kelola Syarat & Ketentuan Paket
+                                    {text('title', 'Kelola Syarat & Ketentuan Paket')}
                                 </h3>
                                 <span className="text-[11px] font-bold bg-[#5D87FF]/10 text-[#5D87FF] px-2 py-0.5 rounded-full">
                                     {terms.length} Kategori
                                 </span>
                             </div>
                             <p className="text-xs text-[#5A6A85] mt-0.5">
-                                Syarat & ketentuan khusus pemesanan paket pada halaman katalog publik.
+                                {text('subtitle', 'Syarat & ketentuan khusus pemesanan paket pada halaman katalog publik.')}
                             </p>
                         </div>
                     </div>
@@ -269,7 +272,7 @@ export const PackageTermsModal: React.FC<PackageTermsModalProps> = ({
                                     className="px-4 py-2 rounded-xl bg-[#5D87FF] hover:bg-[#4871e3] text-white font-semibold text-xs transition-all shadow-[0_4px_12px_rgba(93,135,255,0.25)] flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <Check className="w-3.5 h-3.5" />
-                                    <span>Terapkan Bagian Ini</span>
+                                    <span>{text('apply', 'Terapkan Bagian Ini')}</span>
                                 </button>
                             </div>
                         </div>
@@ -277,7 +280,7 @@ export const PackageTermsModal: React.FC<PackageTermsModalProps> = ({
                         <div className="space-y-3">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-bold text-[#5A6A85] uppercase tracking-wider">
-                                    Daftar Kategori Syarat ({terms.length})
+                                    {text('list', 'Daftar Kategori Syarat')} ({terms.length})
                                 </span>
                                 <button
                                     type="button"
@@ -285,7 +288,7 @@ export const PackageTermsModal: React.FC<PackageTermsModalProps> = ({
                                     className="px-3 py-1.5 rounded-xl bg-[#5D87FF] hover:bg-[#4871e3] text-white font-semibold text-xs transition-all flex items-center gap-1.5 shadow-[0_2px_8px_rgba(93,135,255,0.2)] cursor-pointer"
                                 >
                                     <Plus className="w-3.5 h-3.5" />
-                                    <span>Tambah Kategori Baru</span>
+                                    <span>{text('add', 'Tambah Kategori Baru')}</span>
                                 </button>
                             </div>
 

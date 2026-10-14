@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ViewType, User, Profile } from '../types';
+import { customizeNavigationLabel, customizeNavigationSection, useUiTextOverrides } from '../utils/uiTextCustomization';
 import { Link as LinkIcon } from 'lucide-react';
 import {
   HomeIcon,
@@ -141,6 +142,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
   currentUser,
   profile,
 }) => {
+  const uiTextOverrides = useUiTextOverrides();
   // Find which group currently contains the activeView
   const activeGroupId = useMemo(() => {
     for (const menu of NAV_MENUS) {
@@ -237,7 +239,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
           fixed inset-0 
           bg-black/50 
           backdrop-blur-sm
-          z-30 
+          z-[45]
           xl:hidden 
           transition-all duration-300 ease-out
           ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}
@@ -255,7 +257,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
           w-72 sm:w-80 xl:w-64
           bg-brand-surface 
           flex-col flex-shrink-0 flex 
-          z-40 
+          z-[50]
           transform transition-all duration-300 ease-out
           xl:translate-x-0
           border-r border-brand-border/50
@@ -342,7 +344,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
               const sectionHeader = menu.section ? (
                 <li key={`section-${menu.id}`} className={`${idx === 0 ? 'pt-0' : 'pt-4'} pb-1 px-3`}>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-brand-text-secondary/60 select-none">
-                    {menu.section}
+                    {customizeNavigationSection(menu.section, uiTextOverrides)}
                   </p>
                 </li>
               ) : null;
@@ -388,7 +390,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
 
                         {/* Label */}
                         <span className="flex-1 truncate leading-tight">
-                          {menu.label}
+                          {customizeNavigationLabel(menu.label, uiTextOverrides)}
                         </span>
 
                         {/* Active Indicator */}
@@ -443,7 +445,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
 
                       {/* Label */}
                       <span className="flex-1 truncate leading-tight">
-                        {menu.label}
+                        {customizeNavigationLabel(menu.label, uiTextOverrides)}
                       </span>
 
                       {/* Active Parent Indicator Dot */}
@@ -468,7 +470,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
                       <ul
                         id={`submenu-${menu.id}`}
                         role="region"
-                        aria-label={`Submenu ${menu.label}`}
+                        aria-label={`Submenu ${customizeNavigationLabel(menu.label, uiTextOverrides)}`}
                         className="mt-1.5 mb-2 ml-4 pl-3.5 border-l-2 border-[#EAEFF4] space-y-1"
                       >
                         {menu.items.map((subItem) => {
@@ -501,7 +503,7 @@ const Sidebar: React.FC<SidebarProps> = React.memo(({
                                 ${isSubActive ? 'text-white' : 'text-[#5A6A85] group-hover:text-[#5D87FF]'}
                               `} />
                                 <span className="truncate flex-1">
-                                  {subItem.label}
+                                  {customizeNavigationLabel(subItem.label, uiTextOverrides)}
                                 </span>
                                 {isSubActive && (
                                   <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />

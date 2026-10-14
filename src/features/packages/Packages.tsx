@@ -62,6 +62,7 @@ import {
     GripVertical
 } from 'lucide-react';
 import RupiahInput from '../../shared/form/RupiahInput';
+import { customizeUiText, useUiTextOverrides } from '../../utils/uiTextCustomization';
 
 export interface PackagesProps {
     packages: Package[];
@@ -324,6 +325,8 @@ export const Packages: React.FC<PackagesProps> = ({
     initialAction,
     setInitialAction,
 }) => {
+    const uiTextOverrides = useUiTextOverrides();
+    const text = (key: string, fallback: string) => customizeUiText(`packages.catalog.${key}`, fallback, uiTextOverrides);
     // ── Main UI States ──
     const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
     const [searchTerm, setSearchTerm] = useState('');
@@ -1054,10 +1057,10 @@ export const Packages: React.FC<PackagesProps> = ({
                 <div>
                     <h2 className="text-lg sm:text-xl font-bold text-[#2A3547] tracking-tight flex items-center gap-2">
                         <PackageIcon className="w-5 h-5 text-[#5D87FF] flex-shrink-0" />
-                        <span>Katalog Paket & Layanan</span>
+                        <span>{text('title', 'Katalog Paket & Layanan')}</span>
                     </h2>
                     <p className="text-[11px] sm:text-xs text-[#5A6A85] mt-0.5 line-clamp-2 sm:line-clamp-none">
-                        Kelola paket dokumentasi, opsi durasi dinamis, add-on, dan portofolio penawaran harga pengantin
+                        {text('subtitle', 'Kelola paket dokumentasi, opsi durasi dinamis, add-on, dan portofolio penawaran harga pengantin')}
                     </p>
                 </div>
 
@@ -1140,7 +1143,7 @@ export const Packages: React.FC<PackagesProps> = ({
                         <PackageIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[10px] sm:text-xs font-semibold text-[#5A6A85] truncate">Paket Aktif</p>
+                        <p className="text-[10px] sm:text-xs font-semibold text-[#5A6A85] truncate">{text('activeCount', 'Paket Aktif')}</p>
                         <p className="text-base sm:text-2xl font-bold text-[#2A3547] mt-0.5 leading-none">
                             {stats.totalPackages}
                         </p>
@@ -1153,7 +1156,7 @@ export const Packages: React.FC<PackagesProps> = ({
                         <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[10px] sm:text-xs font-semibold text-[#5A6A85] truncate">Layanan Add-On</p>
+                        <p className="text-[10px] sm:text-xs font-semibold text-[#5A6A85] truncate">{text('addOnsCount', 'Layanan Add-On')}</p>
                         <p className="text-base sm:text-2xl font-bold text-[#2A3547] mt-0.5 leading-none">
                             {stats.totalAddOns}
                         </p>
@@ -1166,7 +1169,7 @@ export const Packages: React.FC<PackagesProps> = ({
                         <Tag className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-[10px] sm:text-xs font-semibold text-[#5A6A85] truncate">Kategori Layanan</p>
+                        <p className="text-[10px] sm:text-xs font-semibold text-[#5A6A85] truncate">{text('categoryCount', 'Kategori Layanan')}</p>
                         <p className="text-base sm:text-2xl font-bold text-[#2A3547] mt-0.5 leading-none">
                             {stats.totalCategories}
                         </p>
@@ -1198,7 +1201,7 @@ export const Packages: React.FC<PackagesProps> = ({
                             type="search"
                             value={searchTerm}
                             onChange={event => setSearchTerm(event.target.value)}
-                            placeholder="Cari paket atau Add-On..."
+                            placeholder={text('search', 'Cari paket atau Add-On...')}
                             className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#EAEFF4] bg-[#F4F6F9] focus:bg-white focus:border-[#5D87FF] text-xs sm:text-sm text-[#2A3547] placeholder-[#5A6A85] outline-none transition-all"
                         />
                     </div>

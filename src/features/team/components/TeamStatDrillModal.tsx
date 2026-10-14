@@ -9,6 +9,7 @@ import Modal from '../../../shared/ui/Modal';
 import { TeamMember, TeamProjectPayment, Project } from '../../../types';
 import { formatCurrency, formatDate, getStatusClass } from '../utils/teamUtils';
 import { StarIcon } from '../../../constants';
+import { customizeUiText, useUiTextOverrides } from '../../../utils/uiTextCustomization';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -314,6 +315,7 @@ const TeamStatDrillModal: React.FC<TeamStatDrillModalProps> = ({
   uniqueVendorMembers,
   projectsInDateRange,
 }) => {
+  const uiTextOverrides = useUiTextOverrides();
   const renderContent = () => {
     if (!activeStatModal) return null;
     const { group, stat } = activeStatModal;
@@ -357,7 +359,11 @@ const TeamStatDrillModal: React.FC<TeamStatDrillModalProps> = ({
   };
 
   const title = activeStatModal
-    ? (MODAL_TITLES[`${activeStatModal.group}-${activeStatModal.stat}`] ?? '')
+    ? customizeUiText(
+      `team.drill.${activeStatModal.group}.${activeStatModal.stat}`,
+      MODAL_TITLES[`${activeStatModal.group}-${activeStatModal.stat}`] ?? '',
+      uiTextOverrides,
+    )
     : '';
 
   return (
