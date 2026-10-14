@@ -34,6 +34,21 @@ describe('public name slugs', () => {
     expect(getGalleryPublicRouteId(gallery, [gallery, duplicate])).toBe(gallery.public_id);
   });
 
+  it('includes gallery region in public links and allows the same title in other regions', () => {
+    const bantenGallery = { id: 'banten-id', public_id: 'priclesit-8ef5y', title: 'Priclesit', region: 'Banten' };
+    const jakartaGallery = { id: 'jakarta-id', public_id: 'priclesit-4abc2', title: 'Priclesit', region: 'Jakarta' };
+
+    expect(toGalleryPublicSlug(bantenGallery.title, bantenGallery.region)).toBe('priclesit-banten');
+    expect(getGalleryPublicRouteId(bantenGallery, [bantenGallery, jakartaGallery])).toBe('priclesit-banten');
+  });
+
+  it('uses the stored public ID when a title and region slug is duplicated', () => {
+    const gallery = { id: 'gallery-id', public_id: 'priclesit-8ef5y', title: 'Priclesit', region: 'Banten' };
+    const duplicate = { id: 'other-id', public_id: 'priclesit-4abc2', title: 'Priclesit', region: 'Banten' };
+
+    expect(getGalleryPublicRouteId(gallery, [gallery, duplicate])).toBe(gallery.public_id);
+  });
+
   it('uses readable package identifiers and keeps IDs for duplicate names in one region', () => {
     const pkg = { id: 'package-id', name: 'Paket Wedding Banten', region: 'banten' };
     const duplicate = { id: 'other-package', name: 'Paket Wedding Banten', region: 'BANTEN' };

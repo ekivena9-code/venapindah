@@ -538,6 +538,7 @@ export const AuthenticatedRoutes: React.FC<AuthenticatedRoutesProps> = ({
           profile={profile}
           clients={clients}
           handleNavigation={handleNavigation}
+          currentUser={currentUser}
         />
       );
 

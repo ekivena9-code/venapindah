@@ -18,20 +18,22 @@ export function toPublicNameSlug(name: string): string {
     .replace(/^-|-$/g, '');
 }
 
-export function toGalleryPublicSlug(title: string): string {
-  return toPublicNameSlug(title).toLowerCase();
+export function toGalleryPublicSlug(title: string, region?: string | null): string {
+  const titleSlug = toPublicNameSlug(title).toLowerCase();
+  const regionSlug = region?.trim() ? toPublicNameSlug(region).toLowerCase() : '';
+  return [titleSlug, regionSlug].filter(Boolean).join('-');
 }
 
 export function getGalleryPublicRouteId(
-  gallery: { id: string; public_id?: string | null; title: string },
-  galleries: readonly { id: string; public_id?: string | null; title: string }[] = []
+  gallery: { id: string; public_id?: string | null; title: string; region?: string | null },
+  galleries: readonly { id: string; public_id?: string | null; title: string; region?: string | null }[] = []
 ): string {
-  const slug = toGalleryPublicSlug(gallery.title);
+  const slug = toGalleryPublicSlug(gallery.title, gallery.region);
   const hasCollision = galleries.some(candidate =>
     candidate.id !== gallery.id && (
       candidate.id === slug ||
       candidate.public_id === slug ||
-      toGalleryPublicSlug(candidate.title) === slug
+      toGalleryPublicSlug(candidate.title, candidate.region) === slug
     )
   );
 

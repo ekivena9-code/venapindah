@@ -14,7 +14,7 @@ interface ClientFilterBarProps {
     setDateTo: (date: string) => void;
     statusFilter: string;
     setStatusFilter: (status: string) => void;
-    onDownloadCSV: () => void;
+    onDownloadExcel: () => void;
 }
 
 export const ClientFilterBar: React.FC<ClientFilterBarProps> = ({
@@ -28,7 +28,7 @@ export const ClientFilterBar: React.FC<ClientFilterBarProps> = ({
     setDateTo,
     statusFilter,
     setStatusFilter,
-    onDownloadCSV,
+    onDownloadExcel,
 }) => {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
     const hasActiveFilters = searchTerm || monthFilter || dateFrom || dateTo || statusFilter !== 'Semua Status';
@@ -88,9 +88,9 @@ export const ClientFilterBar: React.FC<ClientFilterBarProps> = ({
                     {mobileFiltersOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                 </button>
                 <button
-                    onClick={onDownloadCSV}
+                    onClick={onDownloadExcel}
                     className="bg-[#ECF2FF] text-[#5D87FF] font-semibold p-2 rounded-xl inline-flex items-center justify-center shrink-0"
-                    title="Unduh CSV"
+                    title="Unduh Excel lengkap"
                 >
                     <DownloadIcon className="w-3.5 h-3.5" />
                 </button>
@@ -239,9 +239,9 @@ export const ClientFilterBar: React.FC<ClientFilterBarProps> = ({
 
                 {/* Download CSV Button */}
                 <button
-                    onClick={onDownloadCSV}
+                    onClick={onDownloadExcel}
                     className="w-full col-span-2 justify-self-end bg-[#ECF2FF] hover:bg-[#d8e6ff] text-[#5D87FF] font-semibold px-2 sm:px-3 py-2 rounded-xl inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm transition-colors whitespace-nowrap sm:col-auto sm:w-auto"
-                    title="Unduh data pengantin"
+                    title="Unduh data pengantin lengkap (Excel)"
                 >
                     <DownloadIcon className="w-4 h-4" />
                     <span>Unduh</span>

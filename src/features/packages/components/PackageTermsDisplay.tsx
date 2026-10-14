@@ -11,7 +11,7 @@ interface PackageTermsDisplayProps {
 const PackageTermsDisplay: React.FC<PackageTermsDisplayProps> = ({ terms, packageName, showHeader = true }) => (
   <div className="space-y-3">
     {showHeader && (
-      <div className="flex items-start gap-3 rounded-xl border border-[#5D87FF]/20 bg-[#ECF2FF]/60 p-3.5 sm:p-4">
+      <div className="flex items-start gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-[#5D87FF] shadow-sm">
           <FileText className="h-4 w-4" />
         </span>

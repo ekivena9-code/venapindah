@@ -28,25 +28,6 @@ export const ProjectBriefingModal: React.FC<ProjectBriefingModalProps> = ({
                         className="input-field w-full text-sm"
                     />
                     <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2.5 sm:gap-3 pt-4 border-t border-slate-200">
-                        {briefingData.icsDataUri && (
-                            <a
-                                href={briefingData.icsDataUri}
-                                download={`${project.projectName}.ics`}
-                                className="button-secondary text-xs sm:text-sm inline-flex items-center justify-center w-full sm:w-auto"
-                            >
-                                Download .ICS
-                            </a>
-                        )}
-                        {briefingData.googleCalendarLink && (
-                            <a
-                                href={briefingData.googleCalendarLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="button-secondary text-xs sm:text-sm inline-flex items-center justify-center w-full sm:w-auto"
-                            >
-                                Tambah ke Google Calendar
-                            </a>
-                        )}
                         <a
                             href={briefingData.whatsappLink}
                             target="_blank"

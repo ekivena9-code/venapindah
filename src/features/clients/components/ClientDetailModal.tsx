@@ -674,6 +674,10 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
               const remainingBalance = p.totalCost - p.amountPaid;
               const displayProjectName = (p.projectName || '').replace(/^Acara Pernikahan\s+/i, '').trim();
               const pkg = packages.find(pkg => pkg.id === p.packageId || (p.packageName && pkg.name.trim().toLowerCase() === p.packageName.trim().toLowerCase())) || null;
+              const selectedDurationOption = pkg?.durationOptions?.find(option => option.label === p.durationSelection);
+              const teamComposition = selectedDurationOption?.photographers || pkg?.photographers;
+              const packageDescriptionItems = [...(pkg?.digitalItems || [])];
+              if (teamComposition?.trim()) packageDescriptionItems.unshift(`Jumlah Tim: ${teamComposition}`);
               const selectedAddOns = (p.addOns || []).filter(a => a && (a.name || a.id));
               const selectedPackageIds = new Set(packages.map(packageItem => packageItem.id));
               const additionalPackages = p.additionalPackages?.length
@@ -989,9 +993,9 @@ const ClientDetailModal: React.FC<ClientDetailModalProps> = ({
                                 {(p as any).durationSelection}
                               </p>
                             )}
-                            {pkg && pkg.digitalItems && pkg.digitalItems.length > 0 && (
+                            {packageDescriptionItems.length > 0 && (
                               <ul className="mt-1.5 pl-2.5 space-y-0.5 border-l-2 border-brand-accent/30 my-1">
-                                {pkg.digitalItems.map((item, idx) => (
+                                {packageDescriptionItems.map((item, idx) => (
                                   <li key={idx} className="flex items-start gap-1.5 text-[10px] text-brand-text-secondary">
                                     <span className="text-brand-accent font-bold mt-px">·</span>
                                     <span>{item}</span>

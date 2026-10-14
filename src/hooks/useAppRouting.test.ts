@@ -28,8 +28,13 @@ describe('authenticated route restoration', () => {
     ['#/Input%20Package', ViewType.PACKAGES],
     ['#/clients?tab=analytics', ViewType.CLIENTS],
     ['#/projects', ViewType.CLIENTS],
+    ['#/Pricelist%20Upload', ViewType.GALLERY],
   ])('resolves %s to its authenticated page', (hash, expectedView) => {
     expect(resolveAuthenticatedViewFromHash(hash)).toBe(expectedView);
+  });
+
+  it('does not rewrite public gallery URLs as the authenticated gallery page', () => {
+    expect(resolveAuthenticatedViewFromHash('#/gallery/primaryamclesit-banten')).toBeNull();
   });
 
   it('opens the addressed authenticated view immediately after reload', () => {

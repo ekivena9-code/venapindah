@@ -29,6 +29,8 @@ export function resolveAuthenticatedViewFromHash(hash: string): ViewType | null 
 
   const decodedPath = decodeRoutePath(path);
   const firstSegment = decodedPath.split("/")[0];
+  if (firstSegment.toLowerCase() === "gallery" && decodedPath.includes("/")) return null;
+
   const routeView = ROUTE_TO_VIEW_MAP[firstSegment.toLowerCase()];
   if (routeView && routeView !== ViewType.HOMEPAGE) return routeView;
   const aliasedView = LEGACY_VIEW_ALIASES[firstSegment.toLowerCase()];

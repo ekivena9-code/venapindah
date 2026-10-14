@@ -459,11 +459,17 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ userProfile, showNotifica
         }
     };
 
-    const copyPublicLink = (gallery: Gallery) => {
+    const copyPublicLink = async (gallery: Gallery) => {
         const routeId = getGalleryPublicRouteId(gallery, galleries);
         const link = `${window.location.origin}/#/gallery/${routeId}`;
-        navigator.clipboard.writeText(link);
-        showNotification('Link publik berhasil disalin');
+
+        try {
+            await navigator.clipboard.writeText(link);
+            showNotification('Link publik berhasil disalin');
+        } catch (error) {
+            console.error('Error copying gallery link:', error);
+            showNotification('Link publik gagal disalin. Buka halaman publik untuk menyalin URL.');
+        }
     };
 
     const openUploadModal = (gallery: Gallery) => {
@@ -687,9 +693,11 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ userProfile, showNotifica
                             <div className="mt-auto flex items-center gap-2 pt-4 border-t border-brand-border/50">
                                 <div className="flex items-center gap-1.5 flex-shrink-0">
                                     <button
+                                        type="button"
                                         onClick={() => openEditModal(gallery)}
                                         className="button-secondary !w-9 !h-9 !p-0 text-brand-text-secondary hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50"
                                         title="Edit Pricelist"
+                                        aria-label="Edit Pricelist"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -703,22 +711,27 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ userProfile, showNotifica
                                                 rel="noopener noreferrer"
                                                 className="button-secondary !w-9 !h-9 !p-0 text-brand-text-secondary hover:text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50"
                                                 title="Buka Halaman Publik"
+                                                aria-label="Buka Halaman Publik"
                                             >
                                                 <ExternalLink className="w-4 h-4" />
                                             </a>
                                             <button
+                                                type="button"
                                                 onClick={() => copyPublicLink(gallery)}
                                                 className="button-secondary !w-9 !h-9 !p-0 text-brand-text-secondary hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50"
                                                 title="Salin Link Publik"
+                                                aria-label="Salin Link Publik"
                                             >
                                                 <LinkIcon className="w-4 h-4" />
                                             </button>
                                         </>
                                     )}
                                     <button
+                                        type="button"
                                         onClick={() => handleDeleteGallery(gallery.id)}
                                         className="button-secondary !w-9 !h-9 !p-0 text-brand-text-secondary hover:text-red-600 hover:border-red-300 hover:bg-red-50"
                                         title="Hapus Pricelist"
+                                        aria-label="Hapus Pricelist"
                                     >
                                         <TrashIcon className="w-4 h-4" />
                                     </button>

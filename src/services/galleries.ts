@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { compressImage } from './storage';
 import { Gallery, GalleryImage } from '../types';
-import { toPublicNameSlug } from '../utils/publicRouting';
+import { toGalleryPublicSlug, toPublicNameSlug } from '../utils/publicRouting';
 
 const LOCAL_STORAGE_GALLERIES_KEY = 'weddfin-galleries';
 
@@ -118,7 +118,11 @@ export const getPublicGallery = async (publicId: string): Promise<Gallery | null
 
     if (!isSupabaseConfigured) {
         const stored = getStoredGalleries();
-        return stored.find(g => g.public_id === publicId || g.id === publicId) || null;
+        return stored.find(g =>
+            g.public_id === publicId ||
+            g.id === publicId ||
+            (g.is_public && toGalleryPublicSlug(g.title, g.region) === publicId)
+        ) || null;
     }
 
     let data: Gallery | null = null;
@@ -161,7 +165,24 @@ export const getPublicGallery = async (publicId: string): Promise<Gallery | null
         const matches = (candidates || []).filter(gallery =>
             new RegExp(`^${slug}-[a-z0-9]{5}$`, 'i').test(gallery.public_id)
         );
-        return matches.length === 1 ? matches[0] : null;
+        if (matches.length === 1) return matches[0];
+
+        const { data: publicGalleries } = await supabase
+            .from('galleries')
+            .select('id, title, region, public_id')
+            .eq('is_public', true);
+
+        const regionMatches = (publicGalleries || []).filter(gallery =>
+            toGalleryPublicSlug(gallery.title, gallery.region) === slug
+        );
+        if (regionMatches.length !== 1) return null;
+
+        const { data: galleryByPublicId } = await supabase
+            .from('galleries')
+            .select('*')
+            .eq('public_id', regionMatches[0].public_id)
+            .maybeSingle();
+        return galleryByPublicId || null;
     }
 
     return data;
