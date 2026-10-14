@@ -1860,6 +1860,8 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile, transactions, 
         } catch (err: any) {
             console.error('[Settings] User operation failed:', err);
             setUserFormError(err?.message || 'Gagal menyimpan pengguna.');
+        } finally {
+            setIsSaving(false);
         }
     };
 

@@ -217,7 +217,7 @@ const PublicLeadForm: React.FC<PublicLeadFormProps> = ({ setLeads, userProfile, 
                         {/* Service Type */}
                         <div>
                             <label htmlFor="serviceType" className="block text-[10px] font-bold text-zinc-500 mb-1 uppercase tracking-widest">
-                                Layanan
+                                Kategori Acara
                             </label>
                             <select
                                 id="serviceType"

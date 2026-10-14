@@ -18,6 +18,7 @@ const BioLinksPage: React.FC = () => {
     getBioLinkPage().then((data) => {
       if (data) {
         setPage(data);
+        const usedLinkIds = new Set<string>();
         setForm({
           slug: data.slug,
           title: data.title,
@@ -26,7 +27,11 @@ const BioLinksPage: React.FC = () => {
           whatsapp_label: data.whatsapp_label || 'WhatsApp',
           avatar_url: data.avatar_url,
           cover_url: data.cover_url,
-          links: data.links || [],
+          links: (data.links || []).map((link) => {
+            const id = link.id && !usedLinkIds.has(link.id) ? link.id : crypto.randomUUID();
+            usedLinkIds.add(id);
+            return { ...link, id };
+          }),
           is_published: data.is_published,
         });
       }

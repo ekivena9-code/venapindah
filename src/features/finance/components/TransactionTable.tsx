@@ -309,7 +309,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             {/* Built-in Transaction Detail Modal */}
             {selectedDoc && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-                    <div className="bg-brand-surface rounded-2xl p-6 max-w-md w-full border border-brand-border shadow-xl space-y-4">
+                    <div className="bg-brand-surface rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto border border-brand-border shadow-xl space-y-4">
                         <div className="flex justify-between items-center border-b border-brand-border pb-3">
                             <div>
                                 <h3 className="text-sm font-bold text-brand-text-primary">Detail Transaksi</h3>

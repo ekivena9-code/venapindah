@@ -24,8 +24,28 @@ export async function listUsers(): Promise<User[]> {
 }
 
 async function invokeAdminUsers(body: Record<string, unknown>): Promise<any> {
-  const { data, error } = await supabase.functions.invoke('admin-users', { body });
-  if (error) throw new Error(error.message || 'Gagal memproses pengguna.');
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  const accessToken = sessionData.session?.access_token;
+  if (!accessToken) throw new Error('Sesi Supabase tidak ditemukan. Silakan login ulang, lalu coba lagi.');
+
+  const { data, error } = await supabase.functions.invoke('admin-users', {
+    body,
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (error) {
+    let serverMessage: string | undefined;
+    const response = error.context;
+    if (response && typeof response.clone === 'function') {
+      try {
+        const payload = await response.clone().json();
+        if (typeof payload?.error === 'string') serverMessage = payload.error;
+      } catch {
+        // Keep the SDK error when the response has no JSON error payload.
+      }
+    }
+    throw new Error(serverMessage || error.message || 'Gagal memproses pengguna.');
+  }
   if (data?.error) throw new Error(data.error);
   return data;
 }

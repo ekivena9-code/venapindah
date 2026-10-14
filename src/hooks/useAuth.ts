@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { User, ViewType } from "../types";
 import { LAST_ROUTE_STORAGE_KEY } from "../routes/routesConfig";
-import { supabase } from "../lib/supabaseClient";
+import { isSupabaseConfigured, supabase } from "../lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { restoreQueryCache } from "../lib/queryCachePersistence";
 import { resolveAuthenticatedViewFromHash } from "./useAppRouting";
@@ -41,6 +41,25 @@ export function useAuth(): UseAuthReturn {
   });
 
   const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !isAuthenticated) return;
+
+    let isActive = true;
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (!isActive) return;
+      if (error) console.warn('[Auth] Failed to restore Supabase session:', error);
+      if (!data.session) {
+        queryClient.clear();
+        setIsAuthenticated(false);
+        setCurrentUser(null);
+      }
+    });
+
+    return () => {
+      isActive = false;
+    };
+  }, [isAuthenticated, queryClient]);
 
   useEffect(() => {
     window.localStorage.setItem(

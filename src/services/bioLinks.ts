@@ -14,9 +14,9 @@ export const DEFAULT_BIO_LINK_PAGE: BioLinkPageInput = {
   avatar_url: '/assets/images/logos/logoIcon.svg',
   cover_url: '/assets/images/backgrounds/detail-acara-pernikahan.jpg',
   links: [
-    { title: 'Pricelist & Paket Foto', url: '#/public-packages' },
-    { title: 'Formulir Booking Pernikahan', url: '#/public-booking' },
-    { title: 'Profil & Portofolio Vendor', url: '#/profile' },
+    { id: 'pricelist', title: 'Pricelist & Paket Foto', url: '#/public-packages' },
+    { id: 'booking', title: 'Formulir Booking Pernikahan', url: '#/public-booking' },
+    { id: 'vendor-profile', title: 'Profil & Portofolio Vendor', url: '#/profile' },
   ],
   is_published: true,
 };

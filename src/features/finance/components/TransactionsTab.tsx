@@ -459,7 +459,7 @@ const TransactionsTab: React.FC<TransactionsTabProps> = ({
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="transaction-detail-title"
-                        className="w-full max-w-md space-y-4 rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-xl sm:p-6"
+                        className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-brand-border bg-brand-surface p-5 shadow-xl sm:p-6"
                         onClick={event => event.stopPropagation()}
                     >
                         <div className="flex items-center justify-between gap-3 border-b border-brand-border pb-3">
