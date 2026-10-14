@@ -99,17 +99,17 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-black/30" />
 
                 {/* Badges on Cover */}
-                <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between gap-1.5">
-                    <span className="inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-semibold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/10 shadow-sm">
+                <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 flex flex-wrap items-start justify-between gap-1.5">
+                    <span className="inline-flex min-w-0 max-w-full items-center gap-1 text-[8px] sm:text-[10px] font-semibold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/10 shadow-sm">
                         <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#49BEFF] flex-shrink-0" />
-                        <span className="truncate max-w-[90px] sm:max-w-[120px]">{pkg.category || 'Umum'}</span>
+                        <span className="min-w-0 truncate max-w-[90px] sm:max-w-[120px]">{pkg.category || 'Umum'}</span>
                     </span>
 
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex min-w-0 max-w-full flex-wrap items-center justify-end gap-1.5">
                         {pkg.region && (
-                            <span className="inline-flex items-center gap-1 text-[7px] sm:text-[9px] font-semibold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-white/95 text-[#2A3547] backdrop-blur-md shadow-sm uppercase tracking-wider">
+                            <span className="inline-flex min-w-0 max-w-full items-center gap-1 text-[7px] sm:text-[9px] font-semibold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-white/95 text-[#2A3547] backdrop-blur-md shadow-sm uppercase tracking-wider">
                                 <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#5D87FF] flex-shrink-0" />
-                                <span>{pkg.region}</span>
+                                <span className="min-w-0 max-w-[90px] truncate">{pkg.region}</span>
                             </span>
                         )}
                         {(onMoveUp || onMoveDown) && (
@@ -258,9 +258,11 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                             <button
                                 type="button"
                                 onClick={() => onEdit(pkg)}
-                                className="px-2 py-1 rounded-lg bg-[#ECF2FF] text-[#5D87FF] font-bold text-[10px] inline-flex items-center gap-1"
+                                className="mobile-touch-target-icon flex h-11 w-11 min-h-11 min-w-11 items-center justify-center rounded-lg bg-[#ECF2FF] text-[#5D87FF]"
+                                title={text('edit', 'Edit Paket')}
+                                aria-label={text('edit', 'Edit Paket')}
                             >
-                                <Pencil className="w-3 h-3" /> {text('edit', 'Edit Paket')}
+                                <Pencil className="w-4 h-4" />
                             </button>
                         }
                     >

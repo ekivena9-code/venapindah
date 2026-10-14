@@ -1218,16 +1218,16 @@ export const Leads: React.FC<LeadsProps> = ({
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
                     <button
                         type="button"
                         onClick={() => setIsBookingLinksModalOpen(true)}
-                        className="px-3 py-1.5 rounded-lg bg-[#5D87FF]/10 text-[#5D87FF] text-xs font-semibold hover:bg-[#5D87FF]/20 transition-all flex items-center gap-1.5"
+                        className="self-start px-3 py-1.5 rounded-lg bg-[#5D87FF]/10 text-[#5D87FF] text-xs font-semibold hover:bg-[#5D87FF]/20 transition-all flex items-center gap-1.5 sm:self-auto"
                     >
                         <LinkIcon className="w-3.5 h-3.5" />
                         Tautan Booking Publik
                     </button>
-                    <div className="flex items-center gap-1 bg-[#EEF2F7] p-1 rounded-xl self-start sm:self-auto border border-[#E0E6ED]">
+                    <div className="flex max-w-full items-center gap-1 overflow-x-auto bg-[#EEF2F7] p-1 rounded-xl self-start sm:self-auto border border-[#E0E6ED]">
                         <button
                             type="button"
                             onClick={() => setStatCardView('insights')}
@@ -1563,7 +1563,7 @@ export const Leads: React.FC<LeadsProps> = ({
                             </div>
 
                             {/* Mobile grouped list */}
-                            <div className="md:hidden space-y-3 -mx-4 px-4">
+                            <div className="md:hidden space-y-3 -mx-2.5 px-2.5">
                                 {mobileColumnsToRender.map(([status, leadItems]) => {
                                     const statusInfo = statusConfig[status as LeadStatus];
                                     return (

@@ -444,35 +444,35 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ currentDate, selectedYe
                         </div>
                     </div>
                     <div className="flex flex-shrink-0 items-center gap-2">
-                        <button onClick={onToday} className="button-secondary px-3 py-1.5 text-xs">Hari Ini</button>
-                        <button onClick={onAddEvent} className="button-primary p-2" aria-label="Buat Agenda Baru" title="Buat Agenda Baru">
+                        <button onClick={onToday} className="mobile-touch-target button-secondary min-h-11 px-3 py-2 text-xs">Hari Ini</button>
+                        <button onClick={onAddEvent} className="mobile-touch-target mobile-touch-target-icon button-primary h-11 w-11 min-h-11 min-w-11 p-2" aria-label="Buat Agenda Baru" title="Buat Agenda Baru">
                             <PlusIcon className="h-4 w-4" />
                         </button>
                     </div>
                 </div>
                 {stats && (
                     <div className="grid grid-cols-4 gap-2 px-3 pb-2 text-center">
-                        <button type="button" onClick={() => onStatClick('events')} className="min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
+                        <button type="button" onClick={() => onStatClick('events')} className="mobile-touch-target min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
                             <span className="block text-sm font-bold text-brand-accent">{stats.totalProjects}</span>
-                            <span className="block text-[9px] text-brand-text-secondary">Acara</span>
+                            <span className="block text-[10px] text-brand-text-secondary">Acara</span>
                         </button>
-                        <button type="button" onClick={() => onStatClick('internal')} className="min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
+                        <button type="button" onClick={() => onStatClick('internal')} className="mobile-touch-target min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
                             <span className="block text-sm font-bold text-brand-text-primary">{stats.totalInternal}</span>
-                            <span className="block text-[9px] text-brand-text-secondary">Internal</span>
+                            <span className="block text-[10px] text-brand-text-secondary">Internal</span>
                         </button>
-                        <button type="button" onClick={() => onStatClick('clients')} className="min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
+                        <button type="button" onClick={() => onStatClick('clients')} className="mobile-touch-target min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
                             <span className="block text-sm font-bold text-brand-text-primary">{stats.totalClients}</span>
-                            <span className="block text-[9px] text-brand-text-secondary">Pengantin</span>
+                            <span className="block text-[10px] text-brand-text-secondary">Pengantin</span>
                         </button>
-                        <button type="button" onClick={() => onStatClick('team')} className="min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
+                        <button type="button" onClick={() => onStatClick('team')} className="mobile-touch-target min-w-0 rounded-lg py-1 text-center hover:bg-brand-bg">
                             <span className="block text-sm font-bold text-brand-text-primary">{stats.activeTeamMembers}</span>
-                            <span className="block text-[9px] text-brand-text-secondary">Tim</span>
+                            <span className="block text-[10px] text-brand-text-secondary">Tim</span>
                         </button>
                     </div>
                 )}
                 <div className="px-3 pb-3 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                        <button onClick={onFilterClick} aria-label="Buka filter kalender" className="relative inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border border-brand-border bg-white px-2 py-1.5 text-xs font-semibold text-brand-text-light">
+                        <button onClick={onFilterClick} aria-label="Buka filter kalender" className="mobile-touch-target relative inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border border-brand-border bg-white px-3 py-2 text-xs font-semibold text-brand-text-light">
                             <SlidersHorizontal className="h-3.5 w-3.5" />
                             Filter
                             {activeFilterCount > 0 && <span className="inline-flex min-w-4 h-4 items-center justify-center rounded-full bg-brand-accent px-1 text-[9px] text-white">{activeFilterCount}</span>}
@@ -481,7 +481,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ currentDate, selectedYe
                             aria-label="Tampilan kalender"
                             value={viewMode}
                             onChange={(e) => onViewModeChange(e.target.value as any)}
-                            className="input-field w-[92px] min-w-[92px] max-w-[92px] shrink-0 text-xs py-1.5 px-2 rounded-lg"
+                            className="mobile-touch-target input-field min-h-11 w-[92px] min-w-[92px] max-w-[92px] shrink-0 rounded-lg px-2 py-2 text-xs"
                         >
                             {(['Day', 'Week', 'Month', 'Year', 'Team', 'Client', 'Agenda'] as const).map(v => (
                                 <option key={v} value={v}>
@@ -490,7 +490,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({ currentDate, selectedYe
                             ))}
                         </select>
                         {onGoogleSync && (
-                            <button type="button" onClick={onGoogleSync} aria-label="Sinkron Google Calendar" title="Sinkron Google Calendar" className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-border bg-white text-brand-text-secondary hover:bg-brand-bg">
+                            <button type="button" onClick={onGoogleSync} aria-label="Sinkron Google Calendar" title="Sinkron Google Calendar" className="mobile-touch-target mobile-touch-target-icon inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-brand-border bg-white text-brand-text-secondary hover:bg-brand-bg">
                                 <LinkIcon className="h-4 w-4" />
                             </button>
                         )}
@@ -1587,8 +1587,8 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                 onClick={e => e.stopPropagation()}
             >
             <div className="p-4 border-b border-brand-border/40 bg-white/40 flex items-center justify-between shrink-0">
-                <h3 className="font-semibold text-brand-text-light text-sm">{mode === 'detail' ? 'Detail Acara Agenda' : (selectedEvent ? 'Edit Acara Agenda' : 'Buat Agenda')}</h3>
-                <button onClick={onClose} aria-label={mode === 'detail' ? 'Tutup detail agenda' : 'Tutup panel acara'} className="p-2 rounded-full border text-brand-accent hover:bg-[#DCE8FF] transition-colors" style={{ backgroundColor: '#ECF2FF', borderColor: '#D8E6FF' }}>
+                <h3 className="font-semibold text-brand-text-light text-base sm:text-lg">{mode === 'detail' ? 'Detail Acara Agenda' : (selectedEvent ? 'Edit Acara Agenda' : 'Buat Agenda')}</h3>
+                <button onClick={onClose} aria-label={mode === 'detail' ? 'Tutup detail agenda' : 'Tutup panel acara'} className="mobile-touch-target mobile-touch-target-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-brand-accent hover:bg-[#DCE8FF] transition-colors" style={{ backgroundColor: '#ECF2FF', borderColor: '#D8E6FF' }}>
                     {mode === 'detail' ? <X className="h-5 w-5" /> : <ChevronRightIcon className="w-5 h-5" />}
                 </button>
             </div>
@@ -1596,21 +1596,21 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                 {mode === 'detail' && selectedEvent ? (
                     <div className="flex-1 flex flex-col animate-fade-in h-full">
                         <div className="flex border-b border-brand-border/40 bg-white/50 px-2 pt-2 gap-1 shrink-0">
-                            <button onClick={() => setActiveTab('info')} className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'info' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Acara</button>
+                            <button onClick={() => setActiveTab('info')} className={`mobile-touch-target min-h-11 px-3 sm:px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'info' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Acara</button>
                             {selectedEvent.clientId !== 'INTERNAL' && (
                                 <>
-                                    <button onClick={() => setActiveTab('team')} className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'team' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Tim</button>
+                                    <button onClick={() => setActiveTab('team')} className={`mobile-touch-target min-h-11 px-3 sm:px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'team' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Tim</button>
                                 </>
                             )}
-                            <button onClick={() => setActiveTab('notes')} className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'notes' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Keterangan</button>
+                            <button onClick={() => setActiveTab('notes')} className={`mobile-touch-target min-h-11 px-3 sm:px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'notes' ? 'border-brand-accent text-brand-accent' : 'border-transparent text-brand-text-secondary hover:text-brand-text-primary'}`}>Keterangan</button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto custom-scrollbar bg-white/30">
                             {activeTab === 'info' && (
-                                <div className="p-6">
+                                <div className="p-4 sm:p-6">
                                     {selectedEvent.image && <div className="relative h-48 w-full -mx-6 -mt-6 mb-6"><img src={selectedEvent.image} alt={selectedEvent.projectName} className="w-full h-full object-cover" /><div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/60 to-transparent"></div></div>}
-                                    <h3 className="text-xl font-semibold text-brand-text-light">{selectedEvent.projectName}</h3>
-                                    <span className="text-xs font-medium px-2 py-0.5 rounded-full mt-2 inline-block" style={{ backgroundColor: `${getEventColor(selectedEvent, profile)}30`, color: getEventColor(selectedEvent, profile) }}>{selectedEvent.projectType}</span>
+                                    <h3 className="break-words text-lg font-semibold text-brand-text-light sm:text-xl">{selectedEvent.projectName}</h3>
+                                    <span className={`mt-2 rounded-full px-2 py-0.5 text-xs font-medium ${selectedEvent.projectType.length > 24 ? 'hidden sm:inline-block' : 'inline-block'}`} style={{ backgroundColor: `${getEventColor(selectedEvent, profile)}30`, color: getEventColor(selectedEvent, profile) }}>{selectedEvent.projectType}</span>
                                     {selectedEvent.clientId !== 'INTERNAL' && selectedEvent.clientName && (
                                         <div className="mt-4 p-4 bg-white/50 rounded-2xl border border-brand-border/40 flex items-center justify-between shadow-sm cursor-pointer hover:bg-white/80 transition-colors" onClick={() => onNavigateToClient && onNavigateToClient(selectedEvent.clientId || '')}>
                                             <div className="flex items-center gap-3">
@@ -1710,7 +1710,7 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                                                             onClick={() => onTaskDelete?.(task.id)}
                                                             aria-label={`Hapus tugas ${task.name}`}
                                                             title="Hapus tugas"
-                                                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-500 transition-colors hover:border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-300"
+                                                            className="mobile-touch-target mobile-touch-target-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-500 transition-colors hover:border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-300"
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </button>
@@ -1736,7 +1736,7 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                                                 <button
                                                     type="submit"
                                                     disabled={!taskDraft.trim() || !onTaskAdd}
-                                                    className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#5D87FF] px-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#4B75E8] focus:outline-none focus:ring-2 focus:ring-[#5D87FF]/40 disabled:cursor-not-allowed disabled:bg-[#A9BDEB] disabled:shadow-none"
+                                                    className="mobile-touch-target inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#5D87FF] px-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#4B75E8] focus:outline-none focus:ring-2 focus:ring-[#5D87FF]/40 disabled:cursor-not-allowed disabled:bg-[#A9BDEB] disabled:shadow-none"
                                                 >
                                                     <Plus className="h-4 w-4" />
                                                     Tambah
@@ -1753,7 +1753,7 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                             )}
 
                             {activeTab === 'team' && (
-                                <div className="p-6">
+                                <div className="p-4 sm:p-6">
                                     <h4 className="font-semibold text-brand-text-light mb-4 text-sm uppercase tracking-wider text-brand-text-secondary">Tim yang Bertugas</h4>
                                     {selectedEvent.team && selectedEvent.team.length > 0 ? (
                                         <div className="space-y-3">
@@ -1778,7 +1778,7 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                             )}
 
                             {activeTab === 'notes' && (
-                                <div className="p-6">
+                                <div className="p-4 sm:p-6">
                                     <h4 className="font-semibold text-brand-text-light mb-4 text-sm uppercase tracking-wider text-brand-text-secondary">Keterangan</h4>
                                     {selectedEvent.clientId === 'INTERNAL' ? (
                                         <form onSubmit={onSubmit} className="space-y-3">
@@ -1858,7 +1858,7 @@ const EventPanel: React.FC<EventPanelProps> = ({ isOpen, mode, selectedEvent, ev
                             )}
                         </div>
 
-                        <div className="p-6 border-t border-brand-border/40 space-y-2 shrink-0 bg-white/30">
+                        <div className="p-4 sm:p-6 border-t border-brand-border/40 space-y-2 shrink-0 bg-white/30">
                             {selectedEvent.team?.length > 0 && (
                                 <button
                                     type="button"
@@ -2581,7 +2581,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ projects, setProject
                 </div>
             </BottomSheet>
 
-            <div className="flex-1 flex flex-row min-h-0 overflow-visible lg:overflow-hidden">
+            <div className="flex min-w-0 max-w-full flex-1 flex-row min-h-0 overflow-visible lg:overflow-hidden">
                 <div className="flex-1 min-w-0 flex flex-col overflow-visible lg:overflow-y-auto">
                     {/* Stat Cards */}
                     <div className="hidden sm:block p-2.5 sm:p-4 border-b border-brand-border/40 bg-brand-bg/30">

@@ -153,13 +153,15 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
 
                 {/* Header */}
                 {title && (
-                    <div className="flex items-center justify-between px-6 pb-4 border-b border-brand-border">
-                        <h3 className="text-lg font-bold text-brand-text-light">
+                    <div className="flex items-center justify-between gap-3 px-4 pb-3 border-b border-brand-border sm:px-6 sm:pb-4">
+                        <h3 className="min-w-0 break-words text-base font-bold text-brand-text-light sm:text-lg">
                             {title}
                         </h3>
                         <button
                             onClick={onClose}
-                            className="p-2 rounded-lg hover:bg-brand-input transition-colors"
+                            type="button"
+                            aria-label="Tutup panel"
+                            className="mobile-touch-target mobile-touch-target-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-lg hover:bg-brand-input transition-colors"
                         >
                             <XIcon className="w-5 h-5 text-brand-text-secondary" />
                         </button>
@@ -167,7 +169,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
                 )}
 
                 {/* Content */}
-                <div className="overflow-y-auto h-full pb-20 px-6 pt-4">
+                <div className="overflow-y-auto h-full pb-20 px-4 pt-4 sm:px-6">
                     {children}
                 </div>
             </div>

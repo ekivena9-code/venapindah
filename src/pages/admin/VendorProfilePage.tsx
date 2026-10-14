@@ -930,7 +930,7 @@ const VendorProfilePage: React.FC = () => {
 
       {/* ─── Portofolio Acara ─── */}
       <div className="bg-brand-surface border border-brand-border rounded-2xl p-6 space-y-6">
-        <div className="flex items-center justify-between border-b border-brand-border pb-4">
+        <div className="flex flex-col items-start gap-3 border-b border-brand-border pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-bold text-brand-text-primary">Portofolio Acara</h2>
             <p className="text-sm text-brand-text-secondary mt-0.5">{portfolios.length} portofolio</p>

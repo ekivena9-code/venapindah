@@ -90,11 +90,11 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
           <h3
             id="modal-title"
             className="
-              text-sm sm:text-xl 
+              text-base sm:text-xl 
               font-bold 
               text-brand-text-light
               min-w-0
-              break-words
+              break-words leading-snug
               pr-2
             "
           >
@@ -113,10 +113,10 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
               active:bg-red-600
               transition-all duration-200
               flex-shrink-0
-              w-7 h-7 sm:w-10 sm:h-10
-              min-w-[28px] min-h-[28px] sm:min-w-[40px] sm:min-h-[40px]
+              w-11 h-11 min-w-[44px] min-h-[44px]
               flex items-center justify-center
               focus:outline-none
+              mobile-touch-target mobile-touch-target-icon
               focus:ring-2 focus:ring-red-500/30
             "
             aria-label="Close modal"

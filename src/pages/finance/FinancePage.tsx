@@ -325,7 +325,7 @@ const Finance: React.FC<FinanceProps> = ({
         <div className="space-y-5">
 
             {/* ── Page header bar ──────────────────────────────────────────── */}
-            <div className="flex items-center justify-between gap-3 non-printable">
+            <div className="flex flex-wrap items-center justify-between gap-3 non-printable">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-[#ECF2FF] border border-[#d8e6ff]
                                     flex items-center justify-center flex-shrink-0 shadow-xs">

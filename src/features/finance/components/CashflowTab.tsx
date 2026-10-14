@@ -120,7 +120,7 @@ const CashflowTab: React.FC<CashflowTabProps> = ({
                         </p>
                     </div>
                 </div>
-                <div className="overflow-x-auto max-h-96">
+                <div className="min-w-0 w-full overflow-x-auto max-h-96">
                     <table className="w-full text-xs lg:text-sm">
                         <thead className="text-xs text-[#5A6A85] uppercase bg-[#F4F6F9]/80 border-b border-[#EAEFF4] sticky top-0 z-10">
                             <tr className="text-[#5A6A85]">

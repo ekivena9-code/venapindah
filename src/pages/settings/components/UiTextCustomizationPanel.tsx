@@ -7,6 +7,14 @@ import {
     UiTextOverrides,
     useUiTextOverrides,
 } from '../../../utils/uiTextCustomization';
+import {
+    applyMobileUiScale,
+    MOBILE_UI_SCALE_DEFAULT,
+    MOBILE_UI_SCALE_MAX,
+    MOBILE_UI_SCALE_MIN,
+    readMobileUiScale,
+    saveMobileUiScale,
+} from '../../../utils/mobileUiScale';
 
 const GROUPS = [
     'Menu',
@@ -28,6 +36,8 @@ const normalizeOverrides = (overrides: UiTextOverrides): UiTextOverrides => Obje
 
 const UiTextCustomizationPanel: React.FC = () => {
     const savedOverrides = useUiTextOverrides();
+    const [savedMobileUiScale, setSavedMobileUiScale] = useState(readMobileUiScale);
+    const [mobileUiScale, setMobileUiScale] = useState(savedMobileUiScale);
     const [draft, setDraft] = useState<UiTextOverrides>(savedOverrides);
     const [lastSavedGroup, setLastSavedGroup] = useState<string | null>(null);
     const [savingGroup, setSavingGroup] = useState<string | null>(null);
@@ -58,6 +68,18 @@ const UiTextCustomizationPanel: React.FC = () => {
         .filter(key => normalizedSaved[key] !== normalizedDraft[key]);
     const changedKeySet = new Set(changedKeys);
     const normalizedSearch = search.trim().toLocaleLowerCase('id-ID');
+
+    const hasUnsavedMobileScale = Math.abs(mobileUiScale - savedMobileUiScale) > 0.0001;
+
+    const updateMobileUiScale = (value: number) => {
+        setMobileUiScale(value);
+        applyMobileUiScale(value);
+    };
+
+    const saveMobileScale = () => {
+        const nextScale = saveMobileUiScale(mobileUiScale);
+        setSavedMobileUiScale(nextScale);
+    };
 
     const saveGroup = async (group: string) => {
         const groupOptions = UI_TEXT_OPTIONS.filter(option => option.group === group);
@@ -123,6 +145,59 @@ const UiTextCustomizationPanel: React.FC = () => {
                         ? 'Perubahan disimpan ke akun Supabase ini.'
                         : 'Supabase belum dikonfigurasi; perubahan hanya disimpan di browser ini.'}
                 </p>
+            </div>
+
+            <div className="rounded-md border border-brand-border bg-brand-surface p-3">
+                <div className="flex items-start justify-between gap-3">
+                    <div>
+                        <h4 className="text-sm font-semibold text-brand-text-primary">Ukuran teks dan tampilan mobile</h4>
+                        <p className="mt-1 text-xs text-brand-text-secondary">
+                            Mengatur teks, harga, ikon, dan tombol pada semua halaman mobile. Preferensi ini tersimpan di browser ini.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => updateMobileUiScale(MOBILE_UI_SCALE_DEFAULT)}
+                        disabled={mobileUiScale === MOBILE_UI_SCALE_DEFAULT}
+                        className="inline-flex shrink-0 items-center gap-1 rounded border border-brand-border px-2 py-1 text-xs font-medium text-brand-text-secondary hover:bg-brand-bg disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        Reset 100%
+                    </button>
+                </div>
+                <div className="mt-3 flex items-center gap-3">
+                    <span className="text-xs text-brand-text-secondary">Kecil</span>
+                    <input
+                        type="range"
+                        aria-label="Ukuran teks dan tampilan mobile"
+                        min={MOBILE_UI_SCALE_MIN}
+                        max={MOBILE_UI_SCALE_MAX}
+                        step={0.05}
+                        value={mobileUiScale}
+                        onChange={event => updateMobileUiScale(Number(event.target.value))}
+                        className="min-w-0 flex-1 accent-[#5D87FF]"
+                    />
+                    <output className="min-w-12 text-right text-sm font-bold tabular-nums text-brand-text-primary">
+                        {Math.round(mobileUiScale * 100)}%
+                    </output>
+                </div>
+                <div className="mt-1 flex justify-between text-[10px] text-brand-text-secondary">
+                    <span>{Math.round(MOBILE_UI_SCALE_MIN * 100)}%</span>
+                    <span>Normal</span>
+                    <span>{Math.round(MOBILE_UI_SCALE_MAX * 100)}%</span>
+                </div>
+                <div className="mt-3 flex justify-end">
+                    <button
+                        type="button"
+                        onClick={saveMobileScale}
+                        disabled={!hasUnsavedMobileScale}
+                        aria-label="Simpan skala mobile"
+                        className="button-primary inline-flex items-center gap-1 px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <Save className="h-3.5 w-3.5" />
+                        Simpan
+                    </button>
+                </div>
             </div>
 
             <div className="relative">

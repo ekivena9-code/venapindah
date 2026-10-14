@@ -913,17 +913,17 @@ const Dashboard: React.FC<DashboardProps> = ({
                         {customizeUiText('dashboard.subtitle', 'Pusat kendali operasional, agenda pernikahan, dan kesehatan finansial studio.', uiTextOverrides)}
                     </p>
                 </div>
-                <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
+                <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-2.5">
                     <button
                         onClick={() => handleNavigation(ViewType.CLIENTS)}
-                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-semibold py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg sm:rounded-xl bg-[#5D87FF] text-white hover:bg-[#4570EA] shadow-xs transition-colors"
+                        className="min-w-0 flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-semibold py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg sm:rounded-xl bg-[#5D87FF] text-white hover:bg-[#4570EA] shadow-xs transition-colors"
                     >
                         <FolderKanbanIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                         <span>+ Acara Pernikahan</span>
                     </button>
                     <button
                         onClick={() => handleNavigation(ViewType.FINANCE)}
-                        className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-semibold py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg sm:rounded-xl bg-[#ECF2FF] text-[#5D87FF] hover:bg-[#d8e6ff] transition-colors"
+                        className="min-w-0 flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-semibold py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg sm:rounded-xl bg-[#ECF2FF] text-[#5D87FF] hover:bg-[#d8e6ff] transition-colors"
                     >
                         <DollarSignIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                         <span>+ Catat Transaksi</span>
@@ -975,10 +975,10 @@ const Dashboard: React.FC<DashboardProps> = ({
 
             {/* Action Alert Bar (Operational Signals) */}
             <div className="bg-white p-4 md:p-5 rounded-2xl border border-[#EAEFF4] shadow-[0_9px_17.5px_rgba(0,0,0,0.05)]">
-                <div className="dashboard-action-grid grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="dashboard-action-grid grid min-w-0 grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                     <button
                         onClick={() => handleNavigation(ViewType.CALENDAR)}
-                        className="dashboard-action-card flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#ECF2FF] border border-[#EAEFF4] hover:border-[#5D87FF]/30 transition-all text-left group"
+                        className="dashboard-action-card min-w-0 flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#ECF2FF] border border-[#EAEFF4] hover:border-[#5D87FF]/30 transition-all text-left group"
                     >
                         <div className="p-2.5 rounded-xl bg-[#FEF5E5] text-[#FFAE1F] group-hover:scale-105 transition-transform flex-shrink-0">
                             <CalendarIcon className="w-4 h-4" />
@@ -991,7 +991,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                     <button
                         onClick={() => handleNavigation(ViewType.CLIENTS)}
-                        className="dashboard-action-card flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#FDEDE8] border border-[#EAEFF4] hover:border-[#FA896B]/30 transition-all text-left group"
+                        className="dashboard-action-card min-w-0 flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#FDEDE8] border border-[#EAEFF4] hover:border-[#FA896B]/30 transition-all text-left group"
                     >
                         <div className="p-2.5 rounded-xl bg-[#FDEDE8] text-[#FA896B] group-hover:scale-105 transition-transform flex-shrink-0">
                             <AlertCircleIcon className="w-4 h-4" />
@@ -1004,7 +1004,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                     <button
                         onClick={() => setActiveModal('teamMembers')}
-                        className="dashboard-action-card flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#ECF2FF] border border-[#EAEFF4] hover:border-[#5D87FF]/30 transition-all text-left group"
+                        className="dashboard-action-card min-w-0 flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#ECF2FF] border border-[#EAEFF4] hover:border-[#5D87FF]/30 transition-all text-left group"
                     >
                         <div className="p-2.5 rounded-xl bg-[#ECF2FF] text-[#5D87FF] group-hover:scale-105 transition-transform flex-shrink-0">
                             <BriefcaseIcon className="w-4 h-4" />
@@ -1017,7 +1017,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                     <button
                         onClick={() => setActiveModal('payments')}
-                        className="dashboard-action-card flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#E8F7FF] border border-[#EAEFF4] hover:border-[#49BEFF]/30 transition-all text-left group"
+                        className="dashboard-action-card min-w-0 flex items-center gap-3 p-3 rounded-xl bg-[#F4F6F9] hover:bg-[#E8F7FF] border border-[#EAEFF4] hover:border-[#49BEFF]/30 transition-all text-left group"
                     >
                         <div className="p-2.5 rounded-xl bg-[#E8F7FF] text-[#49BEFF] group-hover:scale-105 transition-transform flex-shrink-0">
                             <DollarSignIcon className="w-4 h-4" />

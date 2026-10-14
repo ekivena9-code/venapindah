@@ -1983,12 +1983,12 @@ const ClientReports: React.FC<ClientReportsProps> = ({
                                     })()}
 
                                     {/* Chart area */}
-                                    <div className="ml-8 h-full flex items-end gap-4 pb-6 border-l border-b border-brand-border/30">
+                                    <div className="ml-8 h-full min-w-0 flex items-end gap-4 pb-6 border-l border-b border-brand-border/30">
                                         {clientGrowthData.map((data, index) => {
                                             const maxValue = Math.max(...clientGrowthData.map(d => d.count), 1);
                                             const height = data.count > 0 ? Math.max((data.count / maxValue) * 100, 15) : 0;
                                             return (
-                                                <div key={index} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                                                <div key={index} className="flex-1 min-w-0 flex flex-col items-center gap-2 group h-full justify-end">
                                                     <div className="w-full bg-brand-bg/50 rounded-t-lg relative flex-1 flex items-end">
                                                         {data.count > 0 ? (
                                                             <div
@@ -1999,7 +1999,7 @@ const ClientReports: React.FC<ClientReportsProps> = ({
                                                             <div className="w-full h-1 bg-brand-border/40 rounded-t" />
                                                         )}
                                                         {/* Tooltip */}
-                                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-brand-text-light text-brand-bg text-[10px] font-medium px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 shadow-md">
+                                                        <div className={`absolute -top-8 max-w-[calc(100vw-2rem)] bg-brand-text-light text-brand-bg text-[10px] font-medium px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-normal text-center z-10 shadow-md ${index === clientGrowthData.length - 1 ? 'right-0' : 'left-1/2 -translate-x-1/2'}`}>
                                                             {data.count} pengantin ({data.name})
                                                         </div>
                                                     </div>
@@ -2373,7 +2373,7 @@ const ClientReports: React.FC<ClientReportsProps> = ({
                         <h4 className="text-base font-bold text-gradient">Analisis Kepuasan Pengantin</h4>
                         <p className="text-xs text-brand-text-secondary mt-0.5">{totalFeedback} total testimoni dikumpulkan</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2">
                         <button onClick={() => setIsShareModalOpen(true)} className="button-secondary inline-flex items-center gap-1.5 text-sm">
                             <Share2Icon className="w-4 h-4" /> Bagikan Form
                         </button>

@@ -34,7 +34,7 @@ const TeamPageHeader: React.FC<TeamPageHeaderProps> = ({
     return (
         <div className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200 shadow-[0_9px_17.5px_rgba(0,0,0,0.05)]">
             {/* Mobile Compact Action + Filter Toggle Bar */}
-            <div className="flex sm:hidden items-center justify-between gap-2">
+            <div className="flex flex-wrap sm:hidden items-center justify-between gap-2">
                 <button
                     type="button"
                     onClick={() => setMobileDateOpen(prev => !prev)}
@@ -53,7 +53,7 @@ const TeamPageHeader: React.FC<TeamPageHeaderProps> = ({
                     )}
                     {mobileDateOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                 </button>
-                <div className="flex items-center gap-1.5">
+                <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
                     <button
                         onClick={onDownload}
                         className="button-secondary inline-flex items-center justify-center gap-1 px-2.5 py-2 text-xs border border-slate-200 bg-white text-[#2A3547]"

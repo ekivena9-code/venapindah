@@ -1,8 +1,10 @@
+import fs from 'node:fs';
 import React from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import UiTextCustomizationPanel from './UiTextCustomizationPanel';
 import { customizeNavigationLabel, customizeUiText, readUiTextOverrides } from '../../../utils/uiTextCustomization';
+import { MOBILE_UI_SCALE_STORAGE_KEY } from '../../../utils/mobileUiScale';
 
 vi.mock('../../../services/uiTextOverrides', () => ({
     loadUiTextOverrides: vi.fn().mockResolvedValue(undefined),
@@ -12,6 +14,7 @@ vi.mock('../../../services/uiTextOverrides', () => ({
 describe('UiTextCustomizationPanel', () => {
     beforeEach(() => {
         window.localStorage.clear();
+        document.documentElement.style.removeProperty('--mobile-ui-scale');
     });
 
     it('stages a group reset and applies it only when that group is saved', async () => {
@@ -63,6 +66,96 @@ describe('UiTextCustomizationPanel', () => {
 
         expect(screen.getByLabelText('Field nama paket')).not.toBeNull();
         expect(screen.queryByLabelText('Data Pengantin')).toBeNull();
+    });
+
+    it('saves the mobile text scale only after the user clicks the save button', () => {
+        render(<UiTextCustomizationPanel />);
+
+        fireEvent.change(screen.getByRole('slider', { name: 'Ukuran teks dan tampilan mobile' }), {
+            target: { value: '1.25' },
+        });
+
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBeNull();
+        expect(document.documentElement.style.getPropertyValue('--mobile-ui-scale')).toBe('1.25');
+        expect(screen.getByText('125%')).not.toBeNull();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
+
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1.25');
+    });
+
+    it('resets the applied scale immediately and persists the default only after save', () => {
+        window.localStorage.setItem(MOBILE_UI_SCALE_STORAGE_KEY, '1.25');
+        render(<UiTextCustomizationPanel />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Reset 100%' }));
+
+        expect(document.documentElement.style.getPropertyValue('--mobile-ui-scale')).toBe('1');
+        expect(screen.getByText('100%')).not.toBeNull();
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1.25');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
+
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1');
+    });
+
+    it('applies the user-controlled mobile scale in the app stylesheet', () => {
+        const css = fs.readFileSync(`${process.cwd()}/app/index.css`, 'utf8');
+        const scaleAnchor = css.indexOf('html { font-size: 16px !important;');
+        const scaleStart = css.lastIndexOf('@media (max-width: 768px)', scaleAnchor);
+        const mobileOverrides = css.slice(scaleStart);
+
+        expect(mobileOverrides).toContain('main[data-mobile-ui-scale-excluded="true"]');
+        expect(mobileOverrides).toContain('#invoice');
+        expect(mobileOverrides).toContain('.invoice-document-mobile');
+        expect(mobileOverrides).toContain('.text-xs { font-size: calc(12px * var(--mobile-ui-scale, 1)) !important;');
+        expect(mobileOverrides).toContain('button[class*="text-"]');
+        expect(mobileOverrides).toContain('main button[class*="text-"]');
+        expect(mobileOverrides).toContain('min-height: max(44px, calc(40px * var(--mobile-ui-scale, 1))) !important;');
+        expect(mobileOverrides).toContain('font-size: calc(14px * var(--mobile-ui-scale, 1)) !important;');
+        expect(mobileOverrides).toContain('table td p,');
+        expect(mobileOverrides).toContain('.input-group input.input-field:not([type="checkbox"])');
+        expect(mobileOverrides).toContain('label.input-label,');
+        expect(mobileOverrides).toContain('.stat-card-value,');
+        expect(mobileOverrides).toContain('button[class*="text-"]');
+        expect(mobileOverrides).toContain('button svg,');
+        expect(mobileOverrides).toContain('width: max(16px, calc(16px * var(--mobile-ui-scale, 1))) !important;');
+        expect(mobileOverrides).toContain('button[class*="text-"]:has(svg)');
+        expect(mobileOverrides).toContain(':not([class*="flex-col"]):not(.dashboard-action-card):not(.finance-add-pocket-card)');
+        const iconButtonRuleStart = mobileOverrides.indexOf('button[class*="text-"]:has(svg)');
+        const iconButtonRuleEnd = mobileOverrides.indexOf('}', iconButtonRuleStart);
+        expect(mobileOverrides.slice(iconButtonRuleStart, iconButtonRuleEnd)).not.toContain('white-space: nowrap !important;');
+        expect(mobileOverrides).toContain('[class~="sm:text-2xl"].font-extrabold.tabular-nums');
+        expect(mobileOverrides).toContain('[class~="min-h-[90px]"][class~="sm:min-h-0"]');
+        expect(mobileOverrides).toContain('font-size: min(calc(16px * var(--mobile-ui-scale, 1)), 17px) !important;');
+        expect(mobileOverrides).toContain('[class~="grid-cols-2"][class~="lg:grid-cols-4"] > div[class~="flex"]');
+        expect(mobileOverrides).toContain('width: max-content !important;');
+        expect(mobileOverrides).toContain('font-size: min(calc(14px * var(--mobile-ui-scale, 1)), 16px) !important;');
+        expect(mobileOverrides).toContain('font-size: min(calc(11px * var(--mobile-ui-scale, 1)), 12px) !important;');
+        expect(mobileOverrides).toContain('button[class*="w-11"][class*="h-6"]');
+        expect(mobileOverrides).toContain('width: calc(44px * var(--mobile-ui-scale, 1)) !important;');
+        expect(mobileOverrides).toContain('min-height: max(44px, calc(40px * var(--mobile-ui-scale, 1))) !important;');
+        expect(mobileOverrides).toContain('width: max(16px, calc(16px * var(--mobile-ui-scale, 1))) !important;');
+        expect(mobileOverrides).toContain('a[class*="flex"]');
+        expect(mobileOverrides).toContain('nav[aria-label="breadcrumb"] a');
+        expect(mobileOverrides).toContain('button[class*="w-11"][class*="h-6"]::after');
+        expect(mobileOverrides).toContain('button > span:not([class*="text-"])');
+        expect(mobileOverrides).toContain('[role="dialog"] .grid.grid-cols-2 > div p.text-2xl.font-bold');
+        expect(mobileOverrides).toContain('font-size: clamp(9px, calc(9px * var(--mobile-ui-scale, 1)), 11px) !important;');
+        expect(mobileOverrides).toContain('.dashboard-action-card > div:last-child p:first-child');
+        expect(mobileOverrides).toContain('p.text-xs.font-semibold.truncate');
+            expect(mobileOverrides).toContain('textarea.input-field,');
+            expect(mobileOverrides).toContain('#modal-title:empty');
+        expect(mobileOverrides).toContain('html { font-size: 16px !important; }');
+        expect(mobileOverrides).not.toContain('calc(0.75rem * var(--mobile-ui-scale, 1))');
+    });
+
+    it('keeps labels above inputs instead of floating inside the field box', () => {
+        const css = fs.readFileSync(`${process.cwd()}/app/index.css`, 'utf8');
+
+        expect(css).toContain('.input-group {');
+        expect(css).toContain('.input-group > .input-label');
+        expect(css).toContain('position: static !important');
     });
 
     it('saves only the selected group and preserves drafts in other groups', async () => {

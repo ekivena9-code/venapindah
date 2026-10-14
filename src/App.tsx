@@ -172,6 +172,7 @@ function App() {
         {/* Main Content Area */}
         <main
           className="min-w-0 flex-1 p-3 sm:p-4 md:p-6 lg:p-8 pb-20 xl:pb-8 overflow-y-auto"
+          data-mobile-ui-scale-excluded={routing.activeView === ViewType.INVOICES ? "true" : undefined}
           style={{
             paddingBottom: "calc(5rem + var(--safe-area-inset-bottom, 0px))",
           }}

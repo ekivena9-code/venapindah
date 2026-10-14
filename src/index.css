@@ -1617,20 +1617,50 @@ body {
     min-height: 72px !important; /* Textarea 72px */
   }
 
-  .input-label,
-  label.input-label[class~="!static"],
-  .input-label.form-label-static {
-    font-size: 12px !important; /* Label 12px */
-    left: 10px !important; /* Sejajar dengan padding horizontal 10px */
+  .input-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .input-group > .input-label,
+  .input-group > label.input-label,
+  .input-group > .form-label,
+  .input-group > label.form-label,
+  .input-field + .input-label,
+  .input-field + label.input-label,
+  textarea + .input-label,
+  textarea + label.input-label,
+  select + .input-label,
+  select + label.input-label,
+  input + .input-label,
+  input + label.input-label {
+    order: -1 !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    font-size: 12px !important;
     line-height: 1.2 !important;
+    white-space: normal !important;
   }
 
   .input-field:focus + .input-label,
-  .input-field:not(:placeholder-shown) + .input-label {
-    font-size: 11px !important; /* Floating label 11px */
-    transform: translateY(-50%) scale(1) !important;
-    top: 0.75rem !important;
-    left: 10px !important;
+  .input-field:not(:placeholder-shown) + .input-label,
+  textarea:focus + .input-label,
+  textarea:not(:placeholder-shown) + .input-label,
+  select:focus + .input-label,
+  select:not(:placeholder-shown) + .input-label {
+    order: -1 !important;
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
+    font-size: 12px !important;
   }
 
   .input-helper-text {
@@ -2679,5 +2709,33 @@ select.bg-zinc-800 {
     padding: 0.7rem 1rem !important;
     font-size: 0.9rem !important;
     line-height: 1.25 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  :is(#root, body) .mobile-touch-target {
+    min-height: 44px !important;
+    max-height: none !important;
+    height: auto !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.25 !important;
+  }
+
+  :is(#root, body) .mobile-touch-target-icon {
+    display: inline-flex !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 0 !important;
+  }
+
+  :is(#root, body) .mobile-touch-target-icon svg {
+    width: 20px !important;
+    height: 20px !important;
   }
 }

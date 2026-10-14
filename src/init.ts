@@ -1,4 +1,8 @@
 // Client-side initialization: iOS detection, theme preference, and scroll optimizations
+import { applyMobileUiScale, readMobileUiScale } from './utils/mobileUiScale';
+
+applyMobileUiScale(readMobileUiScale());
+
 try {
   const ua = navigator.userAgent || (navigator as any).vendor || (window as any).opera || '';
   const isIOS = /iPad|iPhone|iPod/.test(ua);
