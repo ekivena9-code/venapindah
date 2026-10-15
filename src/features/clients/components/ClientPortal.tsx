@@ -368,12 +368,14 @@ const ClientPortal: React.FC<ClientPortalProps> = ({
             packageName={Array.from(new Set(clientProjects.map(project =>
               packages.find(pkg => pkg.id === project.packageId)?.name || project.packageName,
             ).filter((name): name is string => !!name))).join(', ') || undefined}
+            showHeader={false}
           />
         )}
         {activeTab === 'workflow' && !isVendorClient && (
           <WorkflowDisplay
             workflows={getWorkflows(profile.publicPageConfig)}
             projectName={clientProjects.map(project => project.projectName).filter(Boolean).join(', ') || undefined}
+            showHeader={false}
           />
         )}
         {activeTab === 'testimoni' && <FeedbackTab client={client} setClientFeedback={setClientFeedback} showNotification={showNotification} />}
