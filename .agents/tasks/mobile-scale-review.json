@@ -1,0 +1,8 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    "`toRow` in profile.ts uses literal `=== 1.0` as the null-for-default sentinel instead of the already-imported `MOBILE_UI_SCALE_DEFAULT` constant. Change to `p.mobileUiScale === MOBILE_UI_SCALE_DEFAULT ? null : p.mobileUiScale` so both encoding sites stay in sync if the constant changes.",
+    "Two independent code paths (`upsertProfile` via `toRow`, and `saveRemoteMobileUiScale` directly) both decide what value to write to `profiles.mobile_ui_scale`. Fixing the literal in issue 1 eliminates the divergence risk between them."
+  ],
+  "reviewDoc": "d:\\terhair final app\\venapindah-main\\.agents\\tasks\\mobile-scale-review.md"
+}
