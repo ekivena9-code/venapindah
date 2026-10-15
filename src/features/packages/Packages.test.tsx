@@ -131,10 +131,15 @@ describe('Packages catalog layout', () => {
 
     const firstPackageCard = screen.getByText('Paket Pertama').closest('.group');
     expect(firstPackageCard).toBeTruthy();
-    fireEvent.click(within(firstPackageCard as HTMLElement).getByRole('button', { name: 'Pindah ke Bawah' }));
+    const mobileMoveDown = firstPackageCard?.querySelector('.package-card-mobile-toolbar button[aria-label="Pindah ke Bawah"]');
+    expect(mobileMoveDown).toBeTruthy();
+    fireEvent.click(mobileMoveDown as HTMLButtonElement);
 
-    expect(within(firstPackageCard as HTMLElement).getByText('#2')).toBeTruthy();
-    expect(screen.getByText('Paket Kedua').closest('.group')?.textContent).toContain('#1');
+    const firstMobileToolbar = firstPackageCard?.querySelector('.package-card-mobile-toolbar');
+    const secondPackageCard = screen.getByText('Paket Kedua').closest('.group');
+    const secondMobileToolbar = secondPackageCard?.querySelector('.package-card-mobile-toolbar');
+    expect(within(firstMobileToolbar as HTMLElement).getByText('#2')).toBeTruthy();
+    expect(within(secondMobileToolbar as HTMLElement).getByText('#1')).toBeTruthy();
   });
 
   it('offers Add-On duplication with a destination-region selector', () => {

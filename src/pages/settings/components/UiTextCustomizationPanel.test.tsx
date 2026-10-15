@@ -6,15 +6,27 @@ import UiTextCustomizationPanel from './UiTextCustomizationPanel';
 import { customizeNavigationLabel, customizeUiText, readUiTextOverrides } from '../../../utils/uiTextCustomization';
 import { MOBILE_UI_SCALE_STORAGE_KEY } from '../../../utils/mobileUiScale';
 
+const mobileScaleMocks = vi.hoisted(() => ({
+    saveRemoteMobileUiScale: vi.fn(),
+}));
+
+vi.mock('../../../lib/supabaseClient', () => ({ isSupabaseConfigured: true }));
+
 vi.mock('../../../services/uiTextOverrides', () => ({
     loadUiTextOverrides: vi.fn().mockResolvedValue(undefined),
     saveRemoteUiTextOverrides: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../../../services/mobileUiScale', () => ({
+    MOBILE_UI_SCALE_SYNC_EVENT: 'venapindah-mobile-ui-scale-sync',
+    saveRemoteMobileUiScale: mobileScaleMocks.saveRemoteMobileUiScale,
 }));
 
 describe('UiTextCustomizationPanel', () => {
     beforeEach(() => {
         window.localStorage.clear();
         document.documentElement.style.removeProperty('--mobile-ui-scale');
+        mobileScaleMocks.saveRemoteMobileUiScale.mockReset().mockImplementation(async (scale: number) => scale);
     });
 
     it('stages a group reset and applies it only when that group is saved', async () => {
@@ -68,7 +80,7 @@ describe('UiTextCustomizationPanel', () => {
         expect(screen.queryByLabelText('Data Pengantin')).toBeNull();
     });
 
-    it('saves the mobile text scale only after the user clicks the save button', () => {
+    it('saves the mobile text scale to Supabase only after the user clicks save', async () => {
         render(<UiTextCustomizationPanel />);
 
         fireEvent.change(screen.getByRole('slider', { name: 'Ukuran teks dan tampilan mobile' }), {
@@ -81,10 +93,12 @@ describe('UiTextCustomizationPanel', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
 
+        await waitFor(() => expect(mobileScaleMocks.saveRemoteMobileUiScale).toHaveBeenCalledWith(1.25));
         expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1.25');
+        expect(screen.getByText('Preferensi disimpan ke akun Supabase ini.')).not.toBeNull();
     });
 
-    it('resets the applied scale immediately and persists the default only after save', () => {
+    it('resets the applied scale immediately and persists the default only after save', async () => {
         window.localStorage.setItem(MOBILE_UI_SCALE_STORAGE_KEY, '1.25');
         render(<UiTextCustomizationPanel />);
 
@@ -96,7 +110,21 @@ describe('UiTextCustomizationPanel', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
 
+        await waitFor(() => expect(mobileScaleMocks.saveRemoteMobileUiScale).toHaveBeenCalledWith(1));
         expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1');
+    });
+
+    it('reports remote persistence errors without marking the preference as saved', async () => {
+        mobileScaleMocks.saveRemoteMobileUiScale.mockRejectedValueOnce(new Error('Kolom belum tersedia.'));
+        render(<UiTextCustomizationPanel />);
+
+        fireEvent.change(screen.getByRole('slider', { name: 'Ukuran teks dan tampilan mobile' }), {
+            target: { value: '1.25' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
+
+        expect((await screen.findByRole('alert')).textContent).toContain('Kolom belum tersedia.');
+        expect((screen.getByRole('button', { name: 'Simpan skala mobile' }) as HTMLButtonElement).disabled).toBe(false);
     });
 
     it('applies the user-controlled mobile scale in the app stylesheet', () => {

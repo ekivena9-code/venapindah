@@ -15,6 +15,7 @@ import {
     readMobileUiScale,
     saveMobileUiScale,
 } from '../../../utils/mobileUiScale';
+import { MOBILE_UI_SCALE_SYNC_EVENT, saveRemoteMobileUiScale } from '../../../services/mobileUiScale';
 
 const GROUPS = [
     'Menu',
@@ -38,6 +39,9 @@ const UiTextCustomizationPanel: React.FC = () => {
     const savedOverrides = useUiTextOverrides();
     const [savedMobileUiScale, setSavedMobileUiScale] = useState(readMobileUiScale);
     const [mobileUiScale, setMobileUiScale] = useState(savedMobileUiScale);
+    const [savingMobileScale, setSavingMobileScale] = useState(false);
+    const [mobileScaleError, setMobileScaleError] = useState<string | null>(null);
+    const [mobileScaleMessage, setMobileScaleMessage] = useState<string | null>(null);
     const [draft, setDraft] = useState<UiTextOverrides>(savedOverrides);
     const [lastSavedGroup, setLastSavedGroup] = useState<string | null>(null);
     const [savingGroup, setSavingGroup] = useState<string | null>(null);
@@ -45,6 +49,18 @@ const UiTextCustomizationPanel: React.FC = () => {
     const [search, setSearch] = useState('');
     const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set(['Menu']));
     const previousSavedRef = useRef(savedOverrides);
+    const mobileScaleEditedRef = useRef(false);
+
+    useEffect(() => {
+        const handleRemoteScaleSync = (event: Event) => {
+            if (mobileScaleEditedRef.current) return;
+            const scale = (event as CustomEvent<number>).detail;
+            setMobileUiScale(scale);
+            setSavedMobileUiScale(scale);
+        };
+        window.addEventListener(MOBILE_UI_SCALE_SYNC_EVENT, handleRemoteScaleSync);
+        return () => window.removeEventListener(MOBILE_UI_SCALE_SYNC_EVENT, handleRemoteScaleSync);
+    }, []);
 
     useEffect(() => {
         const previousSaved = normalizeOverrides(previousSavedRef.current);
@@ -72,13 +88,36 @@ const UiTextCustomizationPanel: React.FC = () => {
     const hasUnsavedMobileScale = Math.abs(mobileUiScale - savedMobileUiScale) > 0.0001;
 
     const updateMobileUiScale = (value: number) => {
+        mobileScaleEditedRef.current = true;
+        setMobileScaleError(null);
+        setMobileScaleMessage(null);
         setMobileUiScale(value);
         applyMobileUiScale(value);
     };
 
-    const saveMobileScale = () => {
+    const saveMobileScale = async () => {
         const nextScale = saveMobileUiScale(mobileUiScale);
-        setSavedMobileUiScale(nextScale);
+        setSavingMobileScale(true);
+        setMobileScaleError(null);
+        setMobileScaleMessage(null);
+        try {
+            if (isSupabaseConfigured) {
+                const savedScale = await saveRemoteMobileUiScale(nextScale);
+                if (savedScale === undefined) throw new Error('Sesi Supabase tidak ditemukan. Silakan masuk kembali.');
+                setSavedMobileUiScale(savedScale);
+                setMobileUiScale(savedScale);
+                saveMobileUiScale(savedScale);
+                setMobileScaleMessage('Preferensi disimpan ke akun Supabase ini.');
+            } else {
+                setSavedMobileUiScale(nextScale);
+                setMobileScaleMessage('Preferensi disimpan di browser ini saja.');
+            }
+            mobileScaleEditedRef.current = false;
+        } catch (error) {
+            setMobileScaleError(error instanceof Error ? error.message : 'Preferensi gagal disimpan ke Supabase.');
+        } finally {
+            setSavingMobileScale(false);
+        }
     };
 
     const saveGroup = async (group: string) => {
@@ -152,7 +191,10 @@ const UiTextCustomizationPanel: React.FC = () => {
                     <div>
                         <h4 className="text-sm font-semibold text-brand-text-primary">Ukuran teks dan tampilan mobile</h4>
                         <p className="mt-1 text-xs text-brand-text-secondary">
-                            Mengatur teks, harga, ikon, dan tombol pada semua halaman mobile. Preferensi ini tersimpan di browser ini.
+                            Mengatur teks, harga, ikon, dan tombol pada semua halaman mobile.{' '}
+                            {isSupabaseConfigured
+                                ? 'Preferensi disimpan ke akun Supabase ini dan digunakan di perangkat lain.'
+                                : 'Preferensi disimpan di browser ini saja karena Supabase belum dikonfigurasi.'}
                         </p>
                     </div>
                     <button
@@ -190,14 +232,16 @@ const UiTextCustomizationPanel: React.FC = () => {
                     <button
                         type="button"
                         onClick={saveMobileScale}
-                        disabled={!hasUnsavedMobileScale}
+                        disabled={!hasUnsavedMobileScale || savingMobileScale}
                         aria-label="Simpan skala mobile"
                         className="button-primary inline-flex items-center gap-1 px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                     >
                         <Save className="h-3.5 w-3.5" />
-                        Simpan
+                        {savingMobileScale ? 'Menyimpan...' : 'Simpan'}
                     </button>
                 </div>
+                {mobileScaleError && <p role="alert" className="mt-2 text-xs font-medium text-red-600">Gagal menyimpan ke Supabase: {mobileScaleError}</p>}
+                {mobileScaleMessage && <p role="status" className="mt-2 text-xs font-medium text-emerald-700">{mobileScaleMessage}</p>}
             </div>
 
             <div className="relative">

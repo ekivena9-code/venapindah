@@ -79,7 +79,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({
     return (
         <div className="h-full bg-white rounded-xl sm:rounded-2xl border border-[#EAEFF4] shadow-[0_4px_16px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.07)] hover:border-[#5D87FF]/30 transition-all duration-300 flex flex-col overflow-hidden group">
             {/* ── Cover Image Header ── */}
-            <div className="relative h-24 sm:h-36 lg:h-48 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
+            <div className="relative h-28 sm:h-40 lg:h-52 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200">
                 {pkg.coverImage ? (
                     <img 
                         src={pkg.coverImage} 
@@ -99,43 +99,43 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-black/30" />
 
                 {/* Badges on Cover */}
-                <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 flex flex-wrap items-start justify-between gap-1.5">
-                    <span className="inline-flex min-w-0 max-w-full items-center gap-1 text-[8px] sm:text-[10px] font-semibold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/10 shadow-sm">
-                        <Tag className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#49BEFF] flex-shrink-0" />
-                        <span className="min-w-0 truncate max-w-[90px] sm:max-w-[120px]">{pkg.category || 'Umum'}</span>
+                <div className="hidden sm:flex absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 flex-wrap items-start justify-between gap-1.5">
+                    <span className="inline-flex min-w-0 max-w-full items-center gap-1 text-[7px] sm:text-[8px] font-semibold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full bg-black/60 text-white backdrop-blur-md border border-white/10 shadow-sm package-card-pill package-card-category-pill">
+                        <Tag className="w-2.5 h-2.5 sm:w-2.5 sm:h-2.5 text-[#49BEFF] flex-shrink-0" />
+                        <span className="package-card-badge-text min-w-0">{pkg.category || 'Umum'}</span>
                     </span>
 
                     <div className="flex min-w-0 max-w-full flex-wrap items-center justify-end gap-1.5">
                         {pkg.region && (
-                            <span className="inline-flex min-w-0 max-w-full items-center gap-1 text-[7px] sm:text-[9px] font-semibold px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-white/95 text-[#2A3547] backdrop-blur-md shadow-sm uppercase tracking-wider">
-                                <MapPin className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#5D87FF] flex-shrink-0" />
-                                <span className="min-w-0 max-w-[90px] truncate">{pkg.region}</span>
+                            <span className="package-card-pill package-card-region-badge inline-flex min-w-0 max-w-full items-center gap-1 text-[6px] sm:text-[8px] font-semibold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full bg-white/95 text-[#2A3547] backdrop-blur-md shadow-sm uppercase tracking-wider">
+                                <MapPin className="w-2.5 h-2.5 sm:w-2.5 sm:h-2.5 text-[#5D87FF] flex-shrink-0" />
+                                <span className="package-card-badge-text min-w-0">{pkg.region}</span>
                             </span>
                         )}
                         {(onMoveUp || onMoveDown) && (
-                            <div className="inline-flex items-center gap-0.5 bg-white/95 backdrop-blur-md px-1.5 py-0.5 rounded-full shadow-sm border border-white/40">
+                            <div className="package-card-toolbar inline-flex items-center gap-0.5">
                                 {orderIndex !== undefined && (
-                                    <span className="text-[9px] font-bold text-[#5A6A85] px-0.5">#{orderIndex + 1}</span>
+                                    <span className="package-card-order-label text-[8px] font-bold text-[#5A6A85] px-0.5">#{orderIndex + 1}</span>
                                 )}
                                 <button
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); onMoveUp?.(); }}
                                     disabled={!canMoveUp}
-                                    className="w-5 h-5 rounded-full bg-[#F4F6F9] hover:bg-[#5D87FF] text-[#5A6A85] hover:text-white flex items-center justify-center disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                                    className="package-card-action-button w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#F4F6F9] hover:bg-[#5D87FF] text-[#5A6A85] hover:text-white flex items-center justify-center disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                                     title="Pindah ke Atas"
                                     aria-label="Pindah ke Atas"
                                 >
-                                    <ChevronUp className="w-3 h-3" />
+                                    <ChevronUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); onMoveDown?.(); }}
                                     disabled={!canMoveDown}
-                                    className="w-5 h-5 rounded-full bg-[#F4F6F9] hover:bg-[#5D87FF] text-[#5A6A85] hover:text-white flex items-center justify-center disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+                                    className="package-card-action-button w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#F4F6F9] hover:bg-[#5D87FF] text-[#5A6A85] hover:text-white flex items-center justify-center disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
                                     title="Pindah ke Bawah"
                                     aria-label="Pindah ke Bawah"
                                 >
-                                    <ChevronDown className="w-3 h-3" />
+                                    <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                 </button>
                             </div>
                         )}
@@ -143,7 +143,7 @@ export const PackageCard: React.FC<PackageCardProps> = ({
                 </div>
 
                 {/* Price display pinned on bottom-left of cover */}
-                <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-end justify-between gap-2">
+                <div className="hidden sm:flex absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 items-end justify-between gap-2">
                     <div className="min-w-0">
                         <p className="text-[8px] sm:text-[10px] uppercase font-semibold tracking-wider text-white/80">{text('investment', 'Investasi')}</p>
                         <p className="text-xs sm:text-lg lg:text-xl font-bold text-white drop-shadow-sm leading-tight truncate">
@@ -161,6 +161,61 @@ export const PackageCard: React.FC<PackageCardProps> = ({
 
             {/* ── Card Content ── */}
             <div className="p-2 sm:p-3.5 lg:p-5 flex-1 flex flex-col gap-1.5 sm:gap-2.5 lg:gap-3.5">
+                <div className="sm:hidden flex items-start justify-between gap-2">
+                    <div className="flex min-w-0 flex-wrap items-center gap-1">
+                        <span className="package-card-pill inline-flex min-w-0 max-w-full items-center gap-1 rounded-full bg-[#ECF2FF] px-2 py-1 text-[10px] font-semibold text-[#365DB5]">
+                            <Tag className="h-3 w-3 flex-shrink-0" />
+                            <span className="package-card-badge-text min-w-0">{pkg.category || 'Umum'}</span>
+                        </span>
+                        {pkg.region && (
+                            <span className="package-card-pill package-card-region-badge inline-flex min-w-0 max-w-full items-center gap-1 rounded-full bg-[#F4F6F9] px-2 py-1 text-[10px] font-semibold text-[#5A6A85]">
+                                <MapPin className="h-3 w-3 flex-shrink-0" />
+                                <span className="package-card-badge-text min-w-0">{pkg.region}</span>
+                            </span>
+                        )}
+                    </div>
+                    {(onMoveUp || onMoveDown) && (
+                        <div className="package-card-toolbar package-card-mobile-toolbar inline-flex flex-shrink-0 items-center gap-0.5">
+                            {orderIndex !== undefined && (
+                                <span className="package-card-order-label px-0.5 text-[8px] font-bold text-[#5A6A85]">#{orderIndex + 1}</span>
+                            )}
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); onMoveUp?.(); }}
+                                disabled={!canMoveUp}
+                                className="package-card-action-button flex h-8 w-8 items-center justify-center rounded-full bg-[#F4F6F9] text-[#5A6A85] disabled:opacity-25 disabled:cursor-not-allowed"
+                                title="Pindah ke Atas"
+                                aria-label="Pindah ke Atas"
+                            >
+                                <ChevronUp className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); onMoveDown?.(); }}
+                                disabled={!canMoveDown}
+                                className="package-card-action-button flex h-8 w-8 items-center justify-center rounded-full bg-[#F4F6F9] text-[#5A6A85] disabled:opacity-25 disabled:cursor-not-allowed"
+                                title="Pindah ke Bawah"
+                                aria-label="Pindah ke Bawah"
+                            >
+                                <ChevronDown className="h-3.5 w-3.5" />
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="sm:hidden flex min-w-0 items-center justify-between gap-2 border-b border-[#EAEFF4] pb-2">
+                    <div className="min-w-0">
+                        <p className="text-[9px] font-semibold uppercase tracking-wide text-[#5A6A85]">{text('investment', 'Investasi')}</p>
+                        <p className="truncate text-sm font-bold leading-tight text-[#2A3547]">{formatCurrency(currentPrice)}</p>
+                    </div>
+                    {pkg.durationOptions && pkg.durationOptions.length > 1 && (
+                        <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-md bg-[#F4F6F9] px-2 py-1 text-[10px] font-medium text-[#5A6A85]">
+                            <Clock className="h-3 w-3" />
+                            <span>{pkg.durationOptions.length} durasi</span>
+                        </span>
+                    )}
+                </div>
+
                 {/* Package Name & Team Info */}
                 <div>
                     <h3 className="font-bold text-xs sm:text-sm lg:text-base text-[#2A3547] leading-snug group-hover:text-[#5D87FF] transition-colors line-clamp-2">

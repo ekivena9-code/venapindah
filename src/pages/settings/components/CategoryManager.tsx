@@ -39,9 +39,25 @@ const CategoryManager: React.FC<CategoryManagerProps> = ({
     const renderCategoryItem = (category: string) => (
         <div key={category} className="flex items-center justify-between px-2.5 py-1 sm:px-3 sm:py-2 bg-[#F4F6F9] rounded-lg sm:rounded-xl">
             <span className="text-xs md:text-sm text-[#2A3547] truncate flex-1 mr-2 leading-tight">{category}</span>
-            <div className="flex items-center space-x-1 md:space-x-1.5 flex-shrink-0">
-                <button type="button" onClick={() => onEdit(category)} className="p-1 sm:p-1.5 !min-h-0 !h-auto text-[#5A6A85] hover:text-[#5D87FF] hover:bg-white rounded-full transition-colors" title="Edit"><PencilIcon className="w-3 h-3 md:w-4 md:h-4" /></button>
-                <button type="button" onClick={() => onDelete(category)} className="p-1 sm:p-1.5 !min-h-0 !h-auto text-[#5A6A85] hover:text-[#FA896B] hover:bg-white rounded-full transition-colors" title="Hapus"><Trash2Icon className="w-3 h-3 md:w-4 md:h-4" /></button>
+            <div className="flex items-center gap-1 md:gap-1.5 flex-shrink-0">
+                <button
+                    type="button"
+                    onClick={() => onEdit(category)}
+                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-[#5A6A85] hover:text-[#5D87FF] hover:bg-white transition-colors"
+                    title="Edit"
+                    aria-label={`Edit ${category}`}
+                >
+                    <PencilIcon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                </button>
+                <button
+                    type="button"
+                    onClick={() => onDelete(category)}
+                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-[#5A6A85] hover:text-[#FA896B] hover:bg-white transition-colors"
+                    title="Hapus"
+                    aria-label={`Hapus ${category}`}
+                >
+                    <Trash2Icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                </button>
             </div>
         </div>
     );

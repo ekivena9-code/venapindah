@@ -1,7 +1,21 @@
 // Client-side initialization: iOS detection, theme preference, and scroll optimizations
 import { applyMobileUiScale, readMobileUiScale } from './utils/mobileUiScale';
+import { isSupabaseConfigured, supabase } from './lib/supabaseClient';
+import { syncRemoteMobileUiScale } from './services/mobileUiScale';
 
 applyMobileUiScale(readMobileUiScale());
+
+if (isSupabaseConfigured) {
+  const syncScale = () => {
+    void syncRemoteMobileUiScale().catch(error => {
+      console.warn('[MobileUiScale] Failed to load the Supabase preference:', error);
+    });
+  };
+  syncScale();
+  supabase.auth.onAuthStateChange(event => {
+    if (event === 'SIGNED_IN') window.setTimeout(syncScale, 0);
+  });
+}
 
 try {
   const ua = navigator.userAgent || (navigator as any).vendor || (window as any).opera || '';

@@ -1127,7 +1127,7 @@ export const Packages: React.FC<PackagesProps> = ({
                     <button
                         type="button"
                         onClick={handleOpenCreatePackage}
-                        className="flex-1 sm:flex-initial min-w-[140px] shrink-0 whitespace-nowrap bg-[#5D87FF] hover:bg-[#4871e3] text-white font-bold px-3.5 sm:px-4 py-2 rounded-xl shadow-[0_4px_12px_rgba(93,135,255,0.25)] inline-flex items-center justify-center gap-1.5 sm:gap-2 text-xs transition-all min-h-[44px] touch-manipulation cursor-pointer"
+                        className="w-full sm:w-auto sm:flex-initial min-w-0 sm:min-w-[140px] flex-none whitespace-nowrap bg-[#5D87FF] hover:bg-[#4871e3] text-white font-bold px-3.5 sm:px-4 py-2 rounded-xl shadow-[0_4px_12px_rgba(93,135,255,0.25)] inline-flex items-center justify-center gap-1.5 sm:gap-2 text-xs transition-all min-h-[44px] touch-manipulation cursor-pointer"
                     >
                         <Plus className="w-4 h-4 flex-shrink-0" />
                         <span>Tambah Paket</span>
