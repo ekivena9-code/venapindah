@@ -117,6 +117,35 @@ const PORTAL_STYLES = `
   .portal-animate-5 { animation-delay:0.25s; }
 
   @media (max-width: 640px) {
+    .portal-page .portal-tab-content {
+      scroll-margin-top: 60px;
+    }
+
+    .portal-page .portal-hero-overlay {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .portal-page .portal-tab-navigation {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      overflow: visible;
+    }
+
+    .portal-page .portal-tab-navigation > .portal-tab-button {
+      min-width: 0;
+      justify-content: center;
+      padding-left: 0.375rem;
+      padding-right: 0.375rem;
+      text-align: center;
+      white-space: normal;
+      line-height: 1.2;
+    }
+
+    :is(#root:not(:has(main[data-mobile-ui-scale-excluded="true"], #invoice, .invoice-document-mobile, .print-invoice, .printable-content, .contract-document, .pdf-viewer)), .app-modal-dialog:not(:has(#invoice, .invoice-document-mobile, .print-invoice, .printable-content, .contract-document, .pdf-viewer))) button:not(.bottom-nav button).portal-tab-button {
+      min-height: 44px !important;
+    }
+
     .portal-page [class*="text-[8px]"] {
       font-size: 0.65rem !important;
       line-height: 1.25 !important;
@@ -245,7 +274,7 @@ const ClientPortal: React.FC<ClientPortalProps> = ({
         style={{ backgroundImage: `url(${profile.publicPageConfig?.backgroundImages?.portalPengantin || '/assets/images/backgrounds/portal-pengantin-3.jpg'})` }}
       >
         {/* Overlay for text readability */}
-        <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+        <div className="portal-hero-overlay absolute inset-0 bg-black/60 pointer-events-none" />
 
         {/* Decorative */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -263,11 +292,11 @@ const ClientPortal: React.FC<ClientPortalProps> = ({
             )}
 
             <div className="flex-1 min-w-0">
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">{profile?.companyName || ''}</p>
+              <p className="text-white/75 text-xs font-semibold uppercase tracking-widest mb-1">{profile?.companyName || ''}</p>
               <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight">
                 Halo, <span className="text-zinc-300">{(client.name || 'Pengantin').split(/[\s&]/)[0]}!</span>
               </h1>
-              <p className="text-white/60 text-sm mt-1 font-medium">Selamat datang di portal pernikahan Anda</p>
+              <p className="text-white/85 text-sm mt-1 font-medium">Selamat datang di portal pernikahan Anda</p>
 
               <div className="mt-3 sm:mt-4 flex flex-wrap gap-2">
                 {clientProjects.length > 0 && (
@@ -298,12 +327,20 @@ const ClientPortal: React.FC<ClientPortalProps> = ({
       ══════════════════════════════════════════════════════════════════ */}
       <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-xl border-b border-zinc-200 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1 py-2 overflow-x-auto scrollbar-hide">
+          <div className="portal-tab-navigation flex gap-1 py-2 overflow-x-auto scrollbar-hide">
             {tabs.map(tab => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex-shrink-0 inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
+                onClick={() => {
+                  setActiveTab(tab.key);
+                  if (window.innerWidth <= 640) {
+                    // Reset scroll to top so the new tab's content starts at the top
+                    // of the viewport (below the sticky tab bar), not at the previous
+                    // tab's scroll position.
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                  }
+                }}
+                className={`portal-tab-button flex-shrink-0 inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
                   activeTab === tab.key
                     ? tab.active
                     : 'text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100'
@@ -319,7 +356,7 @@ const ClientPortal: React.FC<ClientPortalProps> = ({
       {/* ══════════════════════════════════════════════════════════════════
           TAB CONTENT
       ══════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="portal-tab-content max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'beranda' && !isVendorClient && <DashboardTab client={client} projects={clientProjects} profile={profile} packages={packages} />}
         {activeTab === 'proyek' && <ProjectsTab projects={clientProjects} profile={profile} teamMembers={teamMembers} />}
         {activeTab === 'meeting' && <MeetingsTab projects={clientProjects} />}
@@ -512,22 +549,6 @@ const DashboardTab: React.FC<{
   const displayProgress = useMemo(() => activeProject ? getDisplayProgress(activeProject, safeStatusConfig) : 0, [activeProject, safeStatusConfig]);
   const upcomingProject = useMemo(() => (safeProjects || []).filter(p => new Date(p.date) >= new Date()).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0], [safeProjects]);
   const activePackage = useMemo(() => activeProject ? safePackages.find(pk => pk.id === activeProject.packageId) || null : null, [activeProject, safePackages]);
-  const addOnsTotal = useMemo(() => activeProject ? (activeProject.addOns || []).reduce((s, a) => s + (a.price || 0), 0) : 0, [activeProject]);
-  const customCostsTotal = useMemo(() => activeProject ? (activeProject.customCosts || []).reduce((s, c) => s + (c.amount || 0), 0) : 0, [activeProject]);
-
-  const packagePrice = useMemo(() => {
-    if (!activeProject) return 0;
-    if ((activeProject as any).unitPrice) return Number((activeProject as any).unitPrice);
-    if (activePackage) {
-      const dur = (activeProject as any).durationSelection;
-      if (dur && activePackage.durationOptions?.length) {
-        const opt = activePackage.durationOptions.find(o => o.label === dur);
-        return opt ? Number(opt.price) : Number(activePackage.price);
-      }
-      return Number(activePackage.price);
-    }
-    return Math.max(0, activeProject.totalCost + (activeProject.discountAmount || 0) - addOnsTotal - Number(activeProject.transportCost || 0));
-  }, [activeProject, activePackage, addOnsTotal]);
 
   const financial = useMemo(() => ({
     totalValue: safeProjects.reduce((s, p) => s + (p.totalCost || 0), 0),
@@ -606,49 +627,12 @@ const DashboardTab: React.FC<{
             <p className="text-xs text-zinc-500">Detail pesanan Anda</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Package name */}
-            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200">
-              <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1">Paket Terpilih</p>
-              <p className="text-base font-black text-zinc-900">{activeProject.packageName || activePackage?.name || 'Custom Package'}</p>
-              <p className="text-sm font-bold text-zinc-600 mt-1">
-                {formatDisplayCurrency(packagePrice)}
-                {(activeProject as any).durationSelection && <span className="text-zinc-400 font-medium text-xs ml-1">/ {(activeProject as any).durationSelection}</span>}
-              </p>
-            </div>
-
-            {/* Cost summary */}
-            <div className="bg-zinc-900 rounded-2xl p-4 text-white">
-              <p className="text-[9px] font-black uppercase tracking-widest opacity-40 mb-3">Ringkasan Biaya</p>
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs"><span className="opacity-50">Package</span><span className="font-bold">{formatDisplayCurrency(packagePrice)}</span></div>
-                {addOnsTotal > 0 && (
-                  <div className="flex justify-between text-xs"><span className="opacity-50">Add-ons</span><span className="font-bold">{formatDisplayCurrency(addOnsTotal)}</span></div>
-                )}
-                {customCostsTotal > 0 && (
-                  <div className="flex justify-between text-xs"><span className="opacity-50">Biaya Tambahan</span><span className="font-bold">{formatDisplayCurrency(customCostsTotal)}</span></div>
-                )}
-                {Boolean(activeProject.discountAmount) && (
-                  <div className="flex justify-between text-xs"><span className="opacity-50">Diskon</span><span className="font-bold">- {formatDisplayCurrency(activeProject.discountAmount || 0)}</span></div>
-                )}
-                <div className="pt-2 border-t border-white/10 flex justify-between items-center">
-                  <span className="text-[9px] font-black uppercase tracking-widest opacity-40">Total</span>
-                  <span className="text-lg font-black">{formatDisplayCurrency(activeProject.totalCost)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment status */}
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3">
-              <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Terbayar</p>
-              <p className="text-sm font-black text-zinc-900 mt-0.5">{formatDisplayCurrency(activeProject.amountPaid)}</p>
-            </div>
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-3">
-              <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Sisa</p>
-              <p className="text-sm font-black text-zinc-900 mt-0.5">{formatDisplayCurrency(activeProject.totalCost - activeProject.amountPaid)}</p>
-            </div>
+          <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-200">
+            <p className="text-[9px] font-black uppercase tracking-widest text-zinc-500 mb-1">Paket Terpilih</p>
+            <p className="text-base font-black text-zinc-900">{activeProject.packageName || activePackage?.name || 'Custom Package'}</p>
+            {(activeProject as any).durationSelection && (
+              <p className="text-xs font-medium text-zinc-500 mt-1">Durasi: {(activeProject as any).durationSelection}</p>
+            )}
           </div>
 
           {/* Package items */}
@@ -768,10 +752,9 @@ const ProjectsTab: React.FC<{
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-3 divide-x divide-zinc-100">
+            <div className="grid grid-cols-2 divide-x divide-zinc-100">
               {[
                 { label: 'Status', value: selectedProject.status, color: 'text-zinc-800' },
-                { label: 'Progres', value: `${displayProgress}%`, color: 'text-zinc-800' },
                 { label: 'Tahapan', value: `${safeStatusConfig.length} Langkah`, color: 'text-zinc-800' },
               ].map(s => (
                 <div key={s.label} className="px-3 py-2 text-center">
