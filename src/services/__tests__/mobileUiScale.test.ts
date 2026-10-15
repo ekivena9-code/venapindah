@@ -149,6 +149,21 @@ describe('saveRemoteMobileUiScale', () => {
     const result = await saveRemoteMobileUiScale(0.8);
     expect(result).toBeUndefined();
   });
+
+  it('returns undefined (does not throw) when profile row does not exist', async () => {
+    getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
+    const updateFn = vi.fn().mockReturnValue({
+      eq: () => ({
+        select: () => ({
+          maybeSingle: async () => ({ data: null, error: null }),
+        }),
+      }),
+    });
+    fromMock.mockReturnValue({ update: updateFn });
+    const { saveRemoteMobileUiScale } = await import('../mobileUiScale');
+    // Must not throw — returns undefined instead
+    await expect(saveRemoteMobileUiScale(0.8)).resolves.toBeUndefined();
+  });
 });
 
 describe('syncRemoteMobileUiScale', () => {
@@ -179,5 +194,34 @@ describe('syncRemoteMobileUiScale', () => {
     const result = await syncRemoteMobileUiScale();
     expect(result).toBeNull();
     expect(dispatchEventSpy).not.toHaveBeenCalled();
+  });
+
+  it('logs a warning and returns null when sync-up errors on first device', async () => {
+    // remote is null (no stored preference), local scale differs from default
+    localStorage.setItem('venapindah.mobile-ui-scale.v1', '0.85');
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
+    // loadRemoteMobileUiScale: returns null (no preference stored yet)
+    fromMock.mockReturnValueOnce(makeSelectChain({ data: { mobile_ui_scale: null }, error: null }));
+    // saveRemoteMobileUiScale: update fails (e.g., network error)
+    fromMock.mockReturnValueOnce({
+      update: () => ({
+        eq: () => ({
+          select: () => ({
+            maybeSingle: async () => ({ data: null, error: { message: 'network error', code: 'net' } }),
+          }),
+        }),
+      }),
+    });
+    const { syncRemoteMobileUiScale } = await import('../mobileUiScale');
+    const result = await syncRemoteMobileUiScale();
+    // Should not throw — returns null on failure
+    expect(result).toBeNull();
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[MobileUiScale] Failed to push local scale to remote:',
+      expect.anything(),
+    );
+    consoleWarnSpy.mockRestore();
+    localStorage.removeItem('venapindah.mobile-ui-scale.v1');
   });
 });

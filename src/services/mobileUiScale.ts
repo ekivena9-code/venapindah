@@ -62,7 +62,8 @@ export async function saveRemoteMobileUiScale(value: number): Promise<number | u
         .select('mobile_ui_scale')
         .maybeSingle();
     if (error) throw error;
-    if (!data) throw new Error('Profile tidak ditemukan. Buat profil terlebih dahulu.');
+    // No matching row — profile may not exist yet; return undefined without throwing.
+    if (!data) return undefined;
 
     const savedScale = data.mobile_ui_scale;
     return savedScale !== null && savedScale !== undefined
@@ -82,8 +83,8 @@ export async function syncRemoteMobileUiScale(): Promise<number | null> {
             try {
                 await saveRemoteMobileUiScale(localScale);
                 return localScale;
-            } catch {
-                // Ignore sync-up error silently.
+            } catch (err) {
+                console.warn('[MobileUiScale] Failed to push local scale to remote:', err);
             }
         }
         return null;
