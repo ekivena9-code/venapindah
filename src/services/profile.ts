@@ -1,6 +1,6 @@
 import supabase from '../lib/supabaseClient';
 import { Profile, ProjectStatusConfig } from '../types';
-import { normalizeMobileUiScale } from '../utils/mobileUiScale';
+import { MOBILE_UI_SCALE_DEFAULT, normalizeMobileUiScale } from '../utils/mobileUiScale';
 
 const TABLE = 'profiles';
 const TEMPLATE_ENVELOPE_KEYS = [
@@ -115,7 +115,7 @@ function fromRow(row: any): Profile {
     checklistTemplates: templateEnvelope?.checklistTemplates ?? undefined,
     mobileUiScale: (row.mobile_ui_scale !== null && row.mobile_ui_scale !== undefined)
       ? normalizeMobileUiScale(Number(row.mobile_ui_scale))
-      : undefined,
+      : MOBILE_UI_SCALE_DEFAULT,
   } as Profile;
 }
 

@@ -62,8 +62,11 @@ export async function saveRemoteMobileUiScale(value: number): Promise<number | u
         .select('mobile_ui_scale')
         .maybeSingle();
     if (error) throw error;
-    // No matching row — profile may not exist yet; return undefined without throwing.
-    if (!data) return undefined;
+    // No matching row — profile may not exist yet; warn and return undefined without throwing.
+    if (!data) {
+        console.warn('[MobileUiScale] No profile row found for current user; scale preference not saved.');
+        return undefined;
+    }
 
     const savedScale = data.mobile_ui_scale;
     return savedScale !== null && savedScale !== undefined

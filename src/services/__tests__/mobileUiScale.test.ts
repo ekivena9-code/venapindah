@@ -160,9 +160,15 @@ describe('saveRemoteMobileUiScale', () => {
       }),
     });
     fromMock.mockReturnValue({ update: updateFn });
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { saveRemoteMobileUiScale } = await import('../mobileUiScale');
     // Must not throw — returns undefined instead
     await expect(saveRemoteMobileUiScale(0.8)).resolves.toBeUndefined();
+    // Must log a warning so silent failures are observable
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[MobileUiScale] No profile row found for current user; scale preference not saved.',
+    );
+    consoleWarnSpy.mockRestore();
   });
 });
 

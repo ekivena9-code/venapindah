@@ -1,64 +1,45 @@
-Mobile UI Scale Persistence — Implementation Verification
-=========================================================
-Date: 2025-10-15 (updated with review-finding fixes)
-Run on: d:\terhair final app\venapindah-main
+## Mobile UI Scale Persistence — Implementation Verification (Review Fixes)
 
-== Files Changed (iteration 1 — initial implementation) ==
+Date: 2025-01-15
+Iteration: Review fix pass (mobile-scale-review.json findings)
 
-1. supabase/migrations/20261015200000_add_mobile_ui_scale_to_profiles.sql
-   CREATE — adds nullable NUMERIC column `mobile_ui_scale` (CHECK 0.4..1.4) to `profiles`.
+---
 
-2. src/types/index.ts
-   MODIFY — added `mobileUiScale?: number | null` field to the `Profile` interface.
-            (Updated in iteration 2: widened from `number` to `number | null` to match DB semantics.)
+## Findings fixed
 
-3. src/services/profile.ts
-   MODIFY — `fromRow`: reads `row.mobile_ui_scale` and normalizes it via `normalizeMobileUiScale`.
-            `toRow`: writes `mobile_ui_scale` (null for default 1.0).
-            Added import of `normalizeMobileUiScale` from `../utils/mobileUiScale`.
+1. null→undefined asymmetry in fromRow (Finding 1 & 3)
+   - src/types/index.ts: changed `mobileUiScale?: number | null` → `mobileUiScale?: number`
+   - src/services/profile.ts: added `MOBILE_UI_SCALE_DEFAULT` import from utils/mobileUiScale
+   - src/services/profile.ts: fromRow now maps null → MOBILE_UI_SCALE_DEFAULT (1.0) instead of undefined
+   - Round-trip is now clean: write 1.0 → DB stores null → read back yields 1.0 (not undefined)
 
-4. src/services/mobileUiScale.ts
-   REWRITE — `loadRemoteMobileUiScale` now queries `profiles.mobile_ui_scale` instead of
-             `auth.getUser().user_metadata`.
-             `saveRemoteMobileUiScale` now uses `profiles.update()` instead of `auth.updateUser()`.
-             `syncRemoteMobileUiScale` unchanged in public API.
+2. Silent no-op when profile row is absent (Finding 2)
+   - src/services/mobileUiScale.ts: added console.warn('[MobileUiScale] No profile row found for
+     current user; scale preference not saved.') when UPDATE matches no row
 
-5. src/init.ts
-   MODIFY — Removed `readCachedSupabaseScale()` function (stale JWT cache approach).
-            Startup now applies `readMobileUiScale()` directly from localStorage.
-            Removed unused imports: `saveMobileUiScale`, `normalizeMobileUiScale`, `MOBILE_UI_SCALE_DEFAULT`.
+3. Test coverage gaps (Finding 4)
+   - src/services/__tests__/mobileUiScale.test.ts: updated "returns undefined (does not throw)"
+     test to also assert the console.warn is called
+   - src/services/__tests__/profile-mobile-ui-scale.test.ts: NEW — 5 tests for toRow/fromRow
+     round-trip (null→default, numeric, write 1.0 round-trip, write 0.75 round-trip, type check)
+   - src/__tests__/init.test.ts: NEW — 3 tests for init.ts startup sequence
+     (localStorage applied synchronously, sync called with session, sync NOT called without session)
 
-6. src/services/__tests__/mobileUiScale.test.ts
-   CREATE — Unit tests for loadRemoteMobileUiScale, saveRemoteMobileUiScale, syncRemoteMobileUiScale.
+---
 
-7. src/pages/settings/components/UiTextCustomizationPanel.tsx
-   NO CHANGE — API of loadRemoteMobileUiScale / saveRemoteMobileUiScale is unchanged.
+## Build result
 
-== Files Changed (iteration 2 — review finding fixes) ==
-
-Review findings from .agents/tasks/mobile-scale-review.json:
-
-Finding 1: `saveRemoteMobileUiScale` throws when profile row is absent.
-  Fix: Removed `throw new Error('Profile tidak ditemukan...')`. Now returns `undefined` (no row
-       found → silent no-op, consistent with no-session path). Located in mobileUiScale.ts.
-
-Finding 2: Silent sync-up failure on first device swallows errors with no log.
-  Fix: Changed `catch {}` to `catch (err) { console.warn('[MobileUiScale] Failed to push local
-       scale to remote:', err); }` in `syncRemoteMobileUiScale`. Located in mobileUiScale.ts.
-
-Finding 3: `Profile.mobileUiScale` type omits `null`.
-  Fix: Changed `mobileUiScale?: number` to `mobileUiScale?: number | null` in `Profile` interface
-       (src/types/index.ts) to align with DB NUMERIC nullable semantics.
-
-Additional: Added 2 new tests to mobileUiScale.test.ts covering the fixed behaviours:
-  - `saveRemoteMobileUiScale` returns undefined (not throws) when profile row missing.
-  - `syncRemoteMobileUiScale` logs a console.warn on sync-up network error.
-
-== Build Result ==
 Command: npm run build
-Result: SUCCESS — ✓ built in 18.92s, 0 TypeScript errors.
+Working directory: d:\terhair final app\venapindah-main
+Result: SUCCESS (exit 0)
+Output: ✓ 2109 modules transformed, built in ~19s
 
-== Test Result ==
-Command: npm test -- --reporter=verbose
-Result: SUCCESS — 29 test files passed, 128 tests passed (0 failures).
-mobileUiScale tests: src/services/__tests__/mobileUiScale.test.ts — 12/12 tests passed.
+---
+
+## Test result
+
+Command: npm test
+Working directory: d:\terhair final app\venapindah-main
+Result: SUCCESS (exit 0)
+Output: Test Files 31 passed (31), Tests 136 passed (136)
+Duration: ~8.9s
