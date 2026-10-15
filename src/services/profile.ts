@@ -1,5 +1,6 @@
 import supabase from '../lib/supabaseClient';
 import { Profile, ProjectStatusConfig } from '../types';
+import { normalizeMobileUiScale } from '../utils/mobileUiScale';
 
 const TABLE = 'profiles';
 const TEMPLATE_ENVELOPE_KEYS = [
@@ -112,6 +113,9 @@ function fromRow(row: any): Profile {
     expenseShareTemplate: templateEnvelope?.expenseShareTemplate ?? undefined,
     portalShareTemplate: templateEnvelope?.portalShareTemplate ?? undefined,
     checklistTemplates: templateEnvelope?.checklistTemplates ?? undefined,
+    mobileUiScale: (row.mobile_ui_scale !== null && row.mobile_ui_scale !== undefined)
+      ? normalizeMobileUiScale(Number(row.mobile_ui_scale))
+      : undefined,
   } as Profile;
 }
 
@@ -150,6 +154,9 @@ function toRow(p: Partial<Profile>): any {
     ...(p.notificationSettings !== undefined ? { notification_settings: p.notificationSettings } : {}),
     ...(p.securitySettings !== undefined ? { security_settings: p.securitySettings } : {}),
     ...(p.chatTemplates !== undefined ? { chat_templates: p.chatTemplates } : {}),
+    ...(p.mobileUiScale !== undefined
+      ? { mobile_ui_scale: p.mobileUiScale === 1.0 ? null : p.mobileUiScale }
+      : {}),
   };
 }
 

@@ -678,6 +678,7 @@ export interface Profile {
   portalShareTemplate?: string;
   checklistTemplates?: ChecklistTemplate[];
   contractTemplate?: string;
+  mobileUiScale?: number;
 }
 
 export interface TeamProjectPayment {

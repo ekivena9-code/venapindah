@@ -3,6 +3,8 @@ import { applyMobileUiScale, readMobileUiScale } from './utils/mobileUiScale';
 import { isSupabaseConfigured, supabase } from './lib/supabaseClient';
 import { syncRemoteMobileUiScale } from './services/mobileUiScale';
 
+// Apply the locally-cached scale immediately (from a previous session's localStorage write).
+// The async syncRemoteMobileUiScale() below will update this if the remote value differs.
 applyMobileUiScale(readMobileUiScale());
 
 if (isSupabaseConfigured) {

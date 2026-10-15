@@ -7,9 +7,9 @@ import {
     saveMobileUiScale,
 } from '../utils/mobileUiScale';
 
-const USER_METADATA_KEY = 'mobile_ui_scale';
 export const MOBILE_UI_SCALE_SYNC_EVENT = 'venapindah-mobile-ui-scale-sync';
 
+/** Load the scale stored in the `profiles` table for the current user. */
 export async function loadRemoteMobileUiScale(): Promise<number | null | undefined> {
     if (!isSupabaseConfigured) return undefined;
 
@@ -17,16 +17,18 @@ export async function loadRemoteMobileUiScale(): Promise<number | null | undefin
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         if (sessionError || !sessionData?.session) return undefined;
 
-        const { data, error } = await supabase.auth.getUser();
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('mobile_ui_scale')
+            .limit(1)
+            .maybeSingle();
         if (error) {
-            if (error.name === 'AuthSessionMissingError' || error.message?.includes('Auth session missing')) {
-                return undefined;
-            }
+            if (error.code === 'PGRST116') return undefined; // no profile row yet
             throw error;
         }
-        if (!data?.user) return undefined;
+        if (!data) return undefined; // profile not yet created
 
-        const value = data.user.user_metadata?.[USER_METADATA_KEY];
+        const value = data.mobile_ui_scale;
         if (value === null || value === undefined) return null;
 
         const scale = Number(value);
@@ -40,6 +42,7 @@ export async function loadRemoteMobileUiScale(): Promise<number | null | undefin
     }
 }
 
+/** Persist the scale to the `profiles` table for the current user. */
 export async function saveRemoteMobileUiScale(value: number): Promise<number | undefined> {
     const scale = normalizeMobileUiScale(value);
     if (!isSupabaseConfigured) return undefined;
@@ -48,29 +51,39 @@ export async function saveRemoteMobileUiScale(value: number): Promise<number | u
     if (sessionError) throw sessionError;
     if (!sessionData?.session) return undefined;
 
-    const { data, error } = await supabase.auth.updateUser({
-        data: { [USER_METADATA_KEY]: scale },
-    });
-    if (error) throw error;
-    if (!data?.user) throw new Error('Supabase tidak mengembalikan akun pengguna.');
+    const userId = sessionData.session.user.id;
 
-    const savedScale = Number(data.user.user_metadata?.[USER_METADATA_KEY]);
-    if (!Number.isFinite(savedScale)) throw new Error('Supabase tidak mengembalikan preferensi skala yang valid.');
-    return normalizeMobileUiScale(savedScale);
+    // Use update — the profile row is always created at account setup.
+    // RLS ensures we can only update the current user's own row.
+    const { data, error } = await supabase
+        .from('profiles')
+        .update({ mobile_ui_scale: scale === MOBILE_UI_SCALE_DEFAULT ? null : scale })
+        .eq('admin_user_id', userId)
+        .select('mobile_ui_scale')
+        .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Profile tidak ditemukan. Buat profil terlebih dahulu.');
+
+    const savedScale = data.mobile_ui_scale;
+    return savedScale !== null && savedScale !== undefined
+        ? normalizeMobileUiScale(Number(savedScale))
+        : MOBILE_UI_SCALE_DEFAULT;
 }
 
+/** Fetch remote scale, apply it, and sync to localStorage. */
 export async function syncRemoteMobileUiScale(): Promise<number | null> {
     const remoteScale = await loadRemoteMobileUiScale();
     if (remoteScale === undefined) return null;
 
     if (remoteScale === null) {
+        // No remote preference yet — push the local one up if it differs from default.
         const localScale = readMobileUiScale();
         if (localScale !== MOBILE_UI_SCALE_DEFAULT) {
             try {
                 await saveRemoteMobileUiScale(localScale);
                 return localScale;
             } catch {
-                // Ignore sync up error if user cannot write yet
+                // Ignore sync-up error silently.
             }
         }
         return null;
