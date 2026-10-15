@@ -155,7 +155,7 @@ function toRow(p: Partial<Profile>): any {
     ...(p.securitySettings !== undefined ? { security_settings: p.securitySettings } : {}),
     ...(p.chatTemplates !== undefined ? { chat_templates: p.chatTemplates } : {}),
     ...(p.mobileUiScale !== undefined
-      ? { mobile_ui_scale: p.mobileUiScale === 1.0 ? null : p.mobileUiScale }
+      ? { mobile_ui_scale: p.mobileUiScale === MOBILE_UI_SCALE_DEFAULT ? null : p.mobileUiScale }
       : {}),
   };
 }
