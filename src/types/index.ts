@@ -624,6 +624,14 @@ export interface PublicPageConfig {
   packageTerms?: PackageTermItem[]; // Dynamic CRUD terms and conditions for packages
   packageOrder?: string[]; // Ordered array of package IDs for display ordering
   addOnOrder?: string[]; // Ordered array of add-on IDs for display ordering
+  socialMedia?: {
+    instagram?: string;
+    tiktok?: string;
+    facebook?: string;
+    youtube?: string;
+    whatsapp?: string;
+  };
+  secondaryPhone?: string;
 }
 
 export interface Profile {
@@ -635,6 +643,10 @@ export interface Profile {
   companyName: string;
   website: string;
   instagram?: string;
+  tiktok?: string;
+  facebook?: string;
+  youtube?: string;
+  secondaryPhone?: string;
   address: string;
   bankAccount: string;
   authorizedSigner: string;

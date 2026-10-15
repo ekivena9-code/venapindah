@@ -38,6 +38,11 @@ function fromRow(row: any): Profile {
     phone: row.phone || '',
     companyName: row.company_name || '',
     website: row.website || '',
+    instagram: row.public_page_config?.socialMedia?.instagram || row.instagram || undefined,
+    tiktok: row.public_page_config?.socialMedia?.tiktok || row.tiktok || undefined,
+    facebook: row.public_page_config?.socialMedia?.facebook || row.facebook || undefined,
+    youtube: row.public_page_config?.socialMedia?.youtube || row.youtube || undefined,
+    secondaryPhone: row.public_page_config?.secondaryPhone || row.secondary_phone || undefined,
     address: row.address || '',
     bankAccount: row.bank_account || '',
     authorizedSigner: row.authorized_signer || '',
@@ -76,6 +81,8 @@ function fromRow(row: any): Profile {
       packageTerms: row.public_page_config.packageTerms || undefined,
       packageOrder: row.public_page_config.packageOrder || undefined,
       addOnOrder: row.public_page_config.addOnOrder || undefined,
+      socialMedia: row.public_page_config.socialMedia || undefined,
+      secondaryPhone: row.public_page_config.secondaryPhone || undefined,
     } : {
       template: (row.public_page_template || 'classic') as any,
       title: row.public_page_title || 'Vena Pictures',
@@ -90,6 +97,8 @@ function fromRow(row: any): Profile {
       packageTerms: undefined,
       packageOrder: undefined,
       addOnOrder: undefined,
+      socialMedia: undefined,
+      secondaryPhone: undefined,
     },
     packageShareTemplate: row.package_share_template || undefined,
     bookingFormTemplate: templateEnvelope
@@ -202,9 +211,49 @@ export async function upsertProfile(input: Partial<Profile> & { id?: string }): 
     bookingFormTemplatePayload = JSON.stringify(merged);
   }
 
+  let publicPageConfigPayload = input.publicPageConfig;
+  const hasSocialOrExtra = (
+    input.instagram !== undefined ||
+    input.tiktok !== undefined ||
+    input.facebook !== undefined ||
+    input.youtube !== undefined ||
+    input.secondaryPhone !== undefined
+  );
+
+  if (hasSocialOrExtra) {
+    let existingConfig: any = input.publicPageConfig ? { ...input.publicPageConfig } : {};
+    if (!input.publicPageConfig && input.id) {
+      try {
+        const { data: current } = await supabase
+          .from(TABLE)
+          .select('public_page_config')
+          .eq('id', input.id)
+          .maybeSingle();
+        if (current?.public_page_config && typeof current.public_page_config === 'object') {
+          existingConfig = { ...current.public_page_config };
+        }
+      } catch (err) {
+        console.warn('[ProfileService] Failed to fetch existing public_page_config:', err);
+      }
+    }
+    const existingSocial = existingConfig.socialMedia || {};
+    publicPageConfigPayload = {
+      ...existingConfig,
+      socialMedia: {
+        ...existingSocial,
+        ...(input.instagram !== undefined ? { instagram: input.instagram } : {}),
+        ...(input.tiktok !== undefined ? { tiktok: input.tiktok } : {}),
+        ...(input.facebook !== undefined ? { facebook: input.facebook } : {}),
+        ...(input.youtube !== undefined ? { youtube: input.youtube } : {}),
+      },
+      ...(input.secondaryPhone !== undefined ? { secondaryPhone: input.secondaryPhone } : (existingConfig.secondaryPhone !== undefined ? { secondaryPhone: existingConfig.secondaryPhone } : {})),
+    };
+  }
+
   const row = toRow({
     ...input,
     bookingFormTemplate: bookingFormTemplatePayload ?? input.bookingFormTemplate,
+    ...(publicPageConfigPayload !== undefined ? { publicPageConfig: publicPageConfigPayload } : {}),
   } as any);
   if (!input.id && !row.admin_user_id) {
     const { data, error } = await supabase.auth.getUser();

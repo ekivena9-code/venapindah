@@ -11,9 +11,17 @@ if (isSupabaseConfigured) {
       console.warn('[MobileUiScale] Failed to load the Supabase preference:', error);
     });
   };
-  syncScale();
-  supabase.auth.onAuthStateChange(event => {
-    if (event === 'SIGNED_IN') window.setTimeout(syncScale, 0);
+
+  supabase.auth.getSession().then(({ data }) => {
+    if (data?.session) {
+      syncScale();
+    }
+  }).catch(() => {});
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (session?.user && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'USER_UPDATED')) {
+      window.setTimeout(syncScale, 0);
+    }
   });
 }
 

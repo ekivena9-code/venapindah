@@ -7,6 +7,7 @@ import { customizeNavigationLabel, customizeUiText, readUiTextOverrides } from '
 import { MOBILE_UI_SCALE_STORAGE_KEY } from '../../../utils/mobileUiScale';
 
 const mobileScaleMocks = vi.hoisted(() => ({
+    loadRemoteMobileUiScale: vi.fn(),
     saveRemoteMobileUiScale: vi.fn(),
 }));
 
@@ -18,6 +19,7 @@ vi.mock('../../../services/uiTextOverrides', () => ({
 }));
 
 vi.mock('../../../services/mobileUiScale', () => ({
+    loadRemoteMobileUiScale: mobileScaleMocks.loadRemoteMobileUiScale,
     MOBILE_UI_SCALE_SYNC_EVENT: 'venapindah-mobile-ui-scale-sync',
     saveRemoteMobileUiScale: mobileScaleMocks.saveRemoteMobileUiScale,
 }));
@@ -26,6 +28,7 @@ describe('UiTextCustomizationPanel', () => {
     beforeEach(() => {
         window.localStorage.clear();
         document.documentElement.style.removeProperty('--mobile-ui-scale');
+        mobileScaleMocks.loadRemoteMobileUiScale.mockReset().mockResolvedValue(undefined);
         mobileScaleMocks.saveRemoteMobileUiScale.mockReset().mockImplementation(async (scale: number) => scale);
     });
 
@@ -209,5 +212,32 @@ describe('UiTextCustomizationPanel', () => {
         await waitFor(() => {
             expect(customizeUiText('packages.form.field.name', 'Nama Paket', readUiTextOverrides())).toBe('Nama Layanan');
         });
+    });
+
+    it('syncs remote mobile scale when panel mounts', async () => {
+        mobileScaleMocks.loadRemoteMobileUiScale.mockResolvedValueOnce(0.8);
+        render(<UiTextCustomizationPanel />);
+
+        await waitFor(() => {
+            expect(screen.getByText('80%')).not.toBeNull();
+            expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('0.8');
+            expect(document.documentElement.style.getPropertyValue('--mobile-ui-scale')).toBe('0.8');
+        });
+    });
+
+    it('falls back to local persistence cleanly when remote session is absent', async () => {
+        mobileScaleMocks.saveRemoteMobileUiScale.mockResolvedValueOnce(undefined);
+        render(<UiTextCustomizationPanel />);
+
+        fireEvent.change(screen.getByRole('slider', { name: 'Ukuran teks dan tampilan mobile' }), {
+            target: { value: '1.4' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
+
+        await waitFor(() => {
+            expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1.4');
+            expect(screen.getByText('Preferensi disimpan di browser ini.')).not.toBeNull();
+        });
+        expect((screen.getByRole('button', { name: 'Simpan skala mobile' }) as HTMLButtonElement).disabled).toBe(true);
     });
 });

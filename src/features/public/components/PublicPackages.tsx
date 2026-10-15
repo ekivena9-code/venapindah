@@ -786,7 +786,19 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                         font-size: 0.875rem !important;
                         line-height: 1.5 !important;
                     }
-                    .template-wrapper .package-card-title { font-size: 1.05rem !important; line-height: 1.35 !important; }
+                    .template-wrapper .package-card-title {
+                        font-size: 1.35rem !important;
+                        font-weight: 800 !important;
+                        line-height: 1.25 !important;
+                        letter-spacing: -0.01em !important;
+                    }
+                    .template-wrapper .package-main-price {
+                        font-size: 1.75rem !important;
+                        font-weight: 900 !important;
+                        color: var(--color-accent, #5D87FF) !important;
+                        line-height: 1.2 !important;
+                        letter-spacing: -0.02em !important;
+                    }
                     .template-wrapper .package-desc-text { font-size: 0.82rem !important; line-height: 1.5 !important; }
                     .template-wrapper .package-duration-row {
                         display: grid !important;
@@ -796,13 +808,13 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                     }
                     .template-wrapper .package-duration-heading { font-size: 0.75rem !important; }
                     .template-wrapper .package-duration-option {
-                        min-height: 42px !important;
-                        padding: 0.35rem 0.4rem !important;
+                        min-height: 44px !important;
+                        padding: 0.45rem 0.5rem !important;
                         min-width: 0 !important;
                         max-width: 100% !important;
                         width: 100% !important;
                         flex: initial !important;
-                        gap: 0.15rem !important;
+                        gap: 0.2rem !important;
                         display: flex !important;
                         flex-direction: column !important;
                         align-items: center !important;
@@ -810,8 +822,9 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                         text-align: center !important;
                     }
                     .template-wrapper .package-duration-label {
-                        font-size: 0.7rem !important;
-                        line-height: 1.1 !important;
+                        font-size: 0.8rem !important;
+                        font-weight: 600 !important;
+                        line-height: 1.15 !important;
                         min-width: 0 !important;
                         max-width: 100% !important;
                         white-space: nowrap !important;
@@ -821,8 +834,10 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                         text-align: center !important;
                     }
                     .template-wrapper .package-duration-price {
-                        font-size: 0.75rem !important;
-                        line-height: 1.1 !important;
+                        font-size: 1rem !important;
+                        font-weight: 800 !important;
+                        line-height: 1.15 !important;
+                        color: var(--color-accent, #5D87FF) !important;
                         white-space: nowrap !important;
                         flex-shrink: 0 !important;
                         max-width: 100% !important;
@@ -1096,7 +1111,7 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                                                             </div>
                                                         </div>
                                                     ) : (
-                                                        <p className="text-2xl md:text-3xl font-extrabold text-brand-text-light">{formatCurrency(pkg.price)}</p>
+                                                        <p className="package-main-price text-2xl md:text-3xl font-extrabold text-brand-text-light">{formatCurrency(pkg.price)}</p>
                                                     )}
                                                     <div className="package-desc-text space-y-2 text-xs md:text-sm text-brand-text-secondary flex-grow pt-2">
                                                         {pkg.photographers && (
@@ -1145,48 +1160,134 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                         )}
                     </div>
 
-                    {userProfile?.phone && (
-                        <section className="py-16 mt-16 border-t border-brand-border widget-animate" style={{ animationDelay: '550ms' }}>
-                            <div className="max-w-2xl mx-auto text-center">
-                                <h3 className="text-2xl font-bold text-gradient mb-2">Butuh Bantuan?</h3>
-                                <p className="text-brand-text-secondary mb-6">
-                                    Jika ada pertanyaan atau butuh bantuan dalam pengisian formulir, jangan ragu untuk menghubungi admin kami melalui WhatsApp.
-                                </p>
-                                <a
-                                    href={`https://wa.me/${cleanPhoneNumber(userProfile.phone)}?text=${encodeURIComponent('Halo Admin, saya butuh bantuan.')}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="button-secondary inline-flex items-center gap-2"
-                                >
-                                    <WhatsappIcon className="w-5 h-5" />
-                                    Hubungi Admin ({userProfile.phone})
-                                </a>
-                            </div>
-                        </section>
-                    )}
-
                     <section className="py-12 bg-gray-50">
                         <div className="max-w-4xl mx-auto px-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
                                     <h3 className="text-lg font-bold text-brand-text-light mb-4">Social Media</h3>
-                                    <div className="flex space-x-4 mb-6">
-                                        <a href="#" className="text-gray-600 hover:text-brand-accent transition-colors">
-                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
-                                            </svg>
-                                        </a>
-                                        <a href="#" className="text-gray-600 hover:text-brand-accent transition-colors">
-                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-                                            </svg>
-                                        </a>
-                                        <a href="#" className="text-gray-600 hover:text-brand-accent transition-colors">
-                                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                                            </svg>
-                                        </a>
-                                    </div>
+                                    {(() => {
+                                        const formatSocialUrl = (platform: 'tiktok' | 'instagram' | 'facebook' | 'youtube' | 'whatsapp', input?: string): string => {
+                                            if (!input) return '';
+                                            const trimmed = input.trim();
+                                            if (!trimmed) return '';
+                                            if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+
+                                            if (platform === 'tiktok') {
+                                                const handle = trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
+                                                return `https://www.tiktok.com/${handle}`;
+                                            }
+                                            if (platform === 'instagram') {
+                                                const handle = trimmed.replace(/^@/, '');
+                                                return `https://www.instagram.com/${handle}`;
+                                            }
+                                            if (platform === 'facebook') {
+                                                return `https://www.facebook.com/${trimmed.replace(/^@/, '')}`;
+                                            }
+                                            if (platform === 'youtube') {
+                                                const handle = trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
+                                                return `https://www.youtube.com/${handle}`;
+                                            }
+                                            if (platform === 'whatsapp') {
+                                                const cleaned = trimmed.replace(/\D/g, '');
+                                                const normalized = cleaned.startsWith('0') ? `62${cleaned.slice(1)}` : cleaned;
+                                                return `https://wa.me/${normalized}`;
+                                            }
+                                            return trimmed;
+                                        };
+
+                                        const tiktokVal = userProfile.tiktok || userProfile.publicPageConfig?.socialMedia?.tiktok;
+                                        const instagramVal = userProfile.instagram || userProfile.publicPageConfig?.socialMedia?.instagram;
+                                        const facebookVal = userProfile.facebook || userProfile.publicPageConfig?.socialMedia?.facebook;
+                                        const youtubeVal = userProfile.youtube || userProfile.publicPageConfig?.socialMedia?.youtube;
+                                        const whatsappVal = userProfile.phone || userProfile.publicPageConfig?.socialMedia?.whatsapp;
+
+                                        const links = [
+                                            tiktokVal && {
+                                                id: 'tiktok',
+                                                name: 'TikTok',
+                                                url: formatSocialUrl('tiktok', tiktokVal),
+                                                icon: (
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 00-1-.08A6.34 6.34 0 003 15.66a6.34 6.34 0 0010.86 4.43c.27-.27.5-.57.69-.9V11.8a8.16 8.16 0 005.04 1.75v-3.41c-.001 0-.001-.001 0 0a4.85 4.85 0 01-3.45-1.45 4.8 4.8 0 01-1.04-2v-.002h4.49v.002z" />
+                                                    </svg>
+                                                )
+                                            },
+                                            instagramVal && {
+                                                id: 'instagram',
+                                                name: 'Instagram',
+                                                url: formatSocialUrl('instagram', instagramVal),
+                                                icon: (
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
+                                                    </svg>
+                                                )
+                                            },
+                                            facebookVal && {
+                                                id: 'facebook',
+                                                name: 'Facebook',
+                                                url: formatSocialUrl('facebook', facebookVal),
+                                                icon: (
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
+                                                    </svg>
+                                                )
+                                            },
+                                            youtubeVal && {
+                                                id: 'youtube',
+                                                name: 'YouTube',
+                                                url: formatSocialUrl('youtube', youtubeVal),
+                                                icon: (
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                                    </svg>
+                                                )
+                                            },
+                                            whatsappVal && {
+                                                id: 'whatsapp',
+                                                name: 'WhatsApp',
+                                                url: formatSocialUrl('whatsapp', whatsappVal),
+                                                icon: (
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path d="M12.031 2C6.516 2 2.031 6.485 2.031 12c0 1.97.575 3.805 1.568 5.352L2.016 22l4.793-1.554A9.957 9.957 0 0012.031 22c5.515 0 10-4.485 10-10s-4.485-10-10-10zm5.823 14.15c-.244.685-1.22 1.309-1.996 1.409-.529.068-1.221.097-3.535-.863-2.955-1.228-4.858-4.225-5.006-4.421-.143-.197-1.189-1.583-1.189-3.02 0-1.437.753-2.146 1.02-2.438.267-.293.585-.366.78-.366.195 0 .39.002.561.01.181.008.423-.069.66.503.245.586.83 2.025.903 2.172.073.147.122.317.024.513-.097.195-.146.317-.292.488-.147.171-.309.382-.44.513-.147.146-.3.307-.129.6.171.293.76 1.254 1.631 2.03 1.121.997 2.066 1.308 2.359 1.454.293.147.464.122.635-.073.171-.195.732-.854.927-1.147.195-.293.39-.244.66-.146.268.097 1.708.805 2.001.951.293.147.488.22.561.342.073.122.073.708-.171 1.393z"/>
+                                                    </svg>
+                                                )
+                                            }
+                                        ].filter(Boolean) as { id: string; name: string; url: string; icon: React.ReactNode }[];
+
+                                        if (links.length > 0) {
+                                            return (
+                                                <div className="flex flex-wrap items-center gap-3 mb-6">
+                                                    {links.map((item) => (
+                                                        <a
+                                                            key={item.id}
+                                                            href={item.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title={`${item.name} (${item.url})`}
+                                                            aria-label={item.name}
+                                                            className="w-10 h-10 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-700 hover:text-brand-accent hover:border-brand-accent/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                                                        >
+                                                            {item.icon}
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="flex space-x-3 mb-6">
+                                                <span className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400" title="TikTok dapat diatur di menu Pengaturan > Profil">
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 00-1-.08A6.34 6.34 0 003 15.66a6.34 6.34 0 0010.86 4.43c.27-.27.5-.57.69-.9V11.8a8.16 8.16 0 005.04 1.75v-3.41c-.001 0-.001-.001 0 0a4.85 4.85 0 01-3.45-1.45 4.8 4.8 0 01-1.04-2v-.002h4.49v.002z" /></svg>
+                                                </span>
+                                                <span className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400" title="Instagram dapat diatur di menu Pengaturan > Profil">
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" /></svg>
+                                                </span>
+                                                <span className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400" title="Facebook dapat diatur di menu Pengaturan > Profil">
+                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" /></svg>
+                                                </span>
+                                            </div>
+                                        );
+                                    })()}
 
                                     <div className="space-y-2">
                                         <div className="flex items-start">
@@ -1237,10 +1338,10 @@ const PublicPackages: React.FC<PublicPackagesProps> = ({ userProfile: initialUse
                                                         {userProfile.website}
                                                     </a>
                                                 )}
-                                                {userProfile.phone && (
-                                                    <a href={`tel:${userProfile.phone}`}
+                                                {(userProfile.secondaryPhone || (userProfile.publicPageConfig as any)?.secondaryPhone) && (
+                                                    <a href={`tel:${userProfile.secondaryPhone || (userProfile.publicPageConfig as any)?.secondaryPhone}`}
                                                         className="text-gray-700 hover:text-brand-accent transition-colors block">
-                                                        {userProfile.phone}
+                                                        {userProfile.secondaryPhone || (userProfile.publicPageConfig as any)?.secondaryPhone}
                                                     </a>
                                                 )}
                                             </div>

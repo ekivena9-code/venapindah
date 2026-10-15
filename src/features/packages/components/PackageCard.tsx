@@ -205,12 +205,12 @@ export const PackageCard: React.FC<PackageCardProps> = ({
 
                 <div className="sm:hidden flex min-w-0 items-center justify-between gap-2 border-b border-[#EAEFF4] pb-2">
                     <div className="min-w-0">
-                        <p className="text-[9px] font-semibold uppercase tracking-wide text-[#5A6A85]">{text('investment', 'Investasi')}</p>
-                        <p className="truncate text-sm font-bold leading-tight text-[#2A3547]">{formatCurrency(currentPrice)}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#5A6A85]">{text('investment', 'Investasi')}</p>
+                        <p className="package-card-price truncate text-lg sm:text-sm font-black leading-tight text-[#5D87FF] sm:text-[#2A3547] tracking-tight">{formatCurrency(currentPrice)}</p>
                     </div>
                     {pkg.durationOptions && pkg.durationOptions.length > 1 && (
-                        <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-md bg-[#F4F6F9] px-2 py-1 text-[10px] font-medium text-[#5A6A85]">
-                            <Clock className="h-3 w-3" />
+                        <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-md bg-[#5D87FF]/10 text-[#5D87FF] border border-[#5D87FF]/20 px-2 py-1 text-xs font-semibold">
+                            <Clock className="h-3.5 w-3.5" />
                             <span>{pkg.durationOptions.length} durasi</span>
                         </span>
                     )}
@@ -218,12 +218,12 @@ export const PackageCard: React.FC<PackageCardProps> = ({
 
                 {/* Package Name & Team Info */}
                 <div>
-                    <h3 className="font-bold text-xs sm:text-sm lg:text-base text-[#2A3547] leading-snug group-hover:text-[#5D87FF] transition-colors line-clamp-2">
+                    <h3 className="package-card-name font-extrabold text-base sm:text-sm lg:text-base text-[#2A3547] leading-snug group-hover:text-[#5D87FF] transition-colors line-clamp-2">
                         {pkg.name}
                     </h3>
                     {currentTeam && (
-                        <p className="text-[10px] sm:text-xs text-[#5A6A85] mt-1 sm:mt-1.5 flex items-center gap-1 font-medium">
-                            <Users className="w-3 h-3 sm:w-4 sm:h-4 text-[#5D87FF] flex-shrink-0" />
+                        <p className="text-xs sm:text-xs text-[#5A6A85] mt-1 sm:mt-1.5 flex items-center gap-1 font-medium">
+                            <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#5D87FF] flex-shrink-0" />
                             <span className="truncate">{currentTeam}</span>
                         </p>
                     )}

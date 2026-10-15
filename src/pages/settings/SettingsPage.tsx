@@ -2008,7 +2008,8 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile, transactions, 
                                     <div className="input-group"><input id="fullName" type="text" name="fullName" value={localProfile.fullName || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="fullName" className="input-label">Nama Owner</label></div>
                                     <div className="input-group"><input id="companyName" type="text" name="companyName" value={localProfile.companyName || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="companyName" className="input-label">Nama Perusahaan</label></div>
                                     <div className="input-group"><input id="email" type="email" name="email" value={localProfile.email || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="email" className="input-label">Email</label></div>
-                                    <div className="input-group"><input id="phone" type="tel" name="phone" value={localProfile.phone || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="phone" className="input-label">Telepon</label></div>
+                                    <div className="input-group"><input id="phone" type="tel" name="phone" value={localProfile.phone || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="phone" className="input-label">Telepon Utama</label></div>
+                                    <div className="input-group"><input id="secondaryPhone" type="tel" name="secondaryPhone" value={localProfile.secondaryPhone || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="secondaryPhone" className="input-label">Kontak Tambahan (Opsional)</label></div>
                                     <div className="input-group"><input id="website" type="url" name="website" value={localProfile.website || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="website" className="input-label">Website</label></div>
                                 </div>
                                 <div className="input-group"><input id="address" type="text" name="address" value={localProfile.address || ''} onChange={handleInputChange} className="input-field" placeholder=" " /><label htmlFor="address" className="input-label">Alamat</label></div>
@@ -2020,6 +2021,31 @@ const Settings: React.FC<SettingsProps> = ({ profile, setProfile, transactions, 
                                     <div className="input-group"><textarea id="briefingTemplate" name="briefingTemplate" value={localProfile.briefingTemplate || ''} onChange={handleInputChange} className="input-field" placeholder=" " rows={3}></textarea><label htmlFor="briefingTemplate" className="input-label">Template Pesan Briefing Tim</label></div>
                                     <p className="text-xs text-brand-text-secondary mt-1">Ditambahkan di akhir pesan saat membagikan briefing Acara Pernikahan ke tim via WhatsApp.</p>
                                     <button type="button" onClick={() => setProfile(p => ({ ...p, briefingTemplate: DEFAULT_BRIEFING_TEMPLATE }))} className="text-xs text-brand-accent hover:underline mt-2">+ Gunakan contoh</button>
+                                </div>
+                            </div>
+
+                            <h3 className="text-sm md:text-lg font-semibold text-brand-text-light border-b border-gray-700/50 pb-2 md:pb-3 mt-6 md:mt-8">Akun Media Sosial</h3>
+                            <p className="text-xs text-brand-text-secondary max-w-2xl mx-auto -mt-2">
+                                Tautan media sosial ini akan tampil di bagian bawah katalog pricelist &amp; paket publik (http://localhost:3000). Anda dapat memasukkan username (misal: <code>@namapengguna</code>) atau tautan URL lengkap.
+                            </p>
+                            <div className="space-y-3 md:space-y-4 max-w-2xl mx-auto">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                    <div className="input-group">
+                                        <input id="tiktok" type="text" name="tiktok" value={localProfile.tiktok || ''} onChange={handleInputChange} className="input-field" placeholder=" " />
+                                        <label htmlFor="tiktok" className="input-label">TikTok (@username atau URL)</label>
+                                    </div>
+                                    <div className="input-group">
+                                        <input id="instagram" type="text" name="instagram" value={localProfile.instagram || ''} onChange={handleInputChange} className="input-field" placeholder=" " />
+                                        <label htmlFor="instagram" className="input-label">Instagram (@username atau URL)</label>
+                                    </div>
+                                    <div className="input-group">
+                                        <input id="facebook" type="text" name="facebook" value={localProfile.facebook || ''} onChange={handleInputChange} className="input-field" placeholder=" " />
+                                        <label htmlFor="facebook" className="input-label">Facebook (Username / Halaman / URL)</label>
+                                    </div>
+                                    <div className="input-group">
+                                        <input id="youtube" type="text" name="youtube" value={localProfile.youtube || ''} onChange={handleInputChange} className="input-field" placeholder=" " />
+                                        <label htmlFor="youtube" className="input-label">YouTube (@channel atau URL)</label>
+                                    </div>
                                 </div>
                             </div>
 

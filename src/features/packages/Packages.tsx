@@ -300,10 +300,10 @@ const CatalogItemCard: React.FC<CatalogItemCardProps> = ({
                 <span className="text-[10px] font-medium text-[#5A6A85] bg-[#F4F6F9] px-2 py-0.5 rounded-md">{addOn.region || 'Semua Wilayah'}</span>
             </div>
             <p className="mb-1 text-[9px] font-bold uppercase tracking-wider text-[#49BEFF]">Add-On</p>
-            <h3 className="font-bold text-sm text-[#2A3547] leading-snug">{addOn.name}</h3>
+            <h3 className="font-extrabold text-base sm:text-sm text-[#2A3547] leading-snug">{addOn.name}</h3>
         </div>
         <div className="pt-2 border-t border-[#EAEFF4] flex items-center justify-between gap-2">
-            <p className="font-bold text-sm text-[#5D87FF] truncate">{formatCurrency(addOn.price)}</p>
+            <p className="font-black text-base sm:text-sm text-[#5D87FF] truncate">{formatCurrency(addOn.price)}</p>
             <div className="flex items-center gap-1 flex-shrink-0">
                 <button type="button" onClick={() => onEdit(addOn)} className="w-8 h-8 rounded-lg text-[#5A6A85] hover:text-[#5D87FF] hover:bg-[#5D87FF]/10 flex items-center justify-center" title="Edit Add-On"><Pencil className="w-3.5 h-3.5" /></button>
                 <button type="button" onClick={() => onDuplicate(addOn)} className="w-8 h-8 rounded-lg text-[#5A6A85] hover:text-[#5D87FF] hover:bg-[#5D87FF]/10 flex items-center justify-center" title="Duplikat Add-On"><Copy className="w-3.5 h-3.5" /></button>

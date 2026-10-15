@@ -15,7 +15,11 @@ import {
     readMobileUiScale,
     saveMobileUiScale,
 } from '../../../utils/mobileUiScale';
-import { MOBILE_UI_SCALE_SYNC_EVENT, saveRemoteMobileUiScale } from '../../../services/mobileUiScale';
+import {
+    loadRemoteMobileUiScale,
+    MOBILE_UI_SCALE_SYNC_EVENT,
+    saveRemoteMobileUiScale,
+} from '../../../services/mobileUiScale';
 
 const GROUPS = [
     'Menu',
@@ -52,6 +56,7 @@ const UiTextCustomizationPanel: React.FC = () => {
     const mobileScaleEditedRef = useRef(false);
 
     useEffect(() => {
+        let isMounted = true;
         const handleRemoteScaleSync = (event: Event) => {
             if (mobileScaleEditedRef.current) return;
             const scale = (event as CustomEvent<number>).detail;
@@ -59,7 +64,22 @@ const UiTextCustomizationPanel: React.FC = () => {
             setSavedMobileUiScale(scale);
         };
         window.addEventListener(MOBILE_UI_SCALE_SYNC_EVENT, handleRemoteScaleSync);
-        return () => window.removeEventListener(MOBILE_UI_SCALE_SYNC_EVENT, handleRemoteScaleSync);
+
+        if (isSupabaseConfigured && typeof loadRemoteMobileUiScale === 'function') {
+            loadRemoteMobileUiScale().then(remoteScale => {
+                if (!isMounted || mobileScaleEditedRef.current) return;
+                if (remoteScale !== null && remoteScale !== undefined) {
+                    setSavedMobileUiScale(remoteScale);
+                    setMobileUiScale(remoteScale);
+                    saveMobileUiScale(remoteScale);
+                }
+            }).catch(() => {});
+        }
+
+        return () => {
+            isMounted = false;
+            window.removeEventListener(MOBILE_UI_SCALE_SYNC_EVENT, handleRemoteScaleSync);
+        };
     }, []);
 
     useEffect(() => {
@@ -103,11 +123,15 @@ const UiTextCustomizationPanel: React.FC = () => {
         try {
             if (isSupabaseConfigured) {
                 const savedScale = await saveRemoteMobileUiScale(nextScale);
-                if (savedScale === undefined) throw new Error('Sesi Supabase tidak ditemukan. Silakan masuk kembali.');
-                setSavedMobileUiScale(savedScale);
-                setMobileUiScale(savedScale);
-                saveMobileUiScale(savedScale);
-                setMobileScaleMessage('Preferensi disimpan ke akun Supabase ini.');
+                if (savedScale === undefined) {
+                    setSavedMobileUiScale(nextScale);
+                    setMobileScaleMessage('Preferensi disimpan di browser ini.');
+                } else {
+                    setSavedMobileUiScale(savedScale);
+                    setMobileUiScale(savedScale);
+                    saveMobileUiScale(savedScale);
+                    setMobileScaleMessage('Preferensi disimpan ke akun Supabase ini.');
+                }
             } else {
                 setSavedMobileUiScale(nextScale);
                 setMobileScaleMessage('Preferensi disimpan di browser ini saja.');

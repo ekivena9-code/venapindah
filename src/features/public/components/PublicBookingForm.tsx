@@ -961,20 +961,7 @@ Mohon konfirmasi untuk langkah selanjutnya. Terima kasih! 🙏`;
                         <h1 className="text-2xl md:text-3xl font-bold text-gradient">{userProfile.companyName}</h1>
                     </div>
 
-                    <div className="mb-5 flex flex-wrap justify-center gap-2">
-                        {regionOptions.map(region => {
-                            const isActive = normalizePublicBookingRegion(selectedRegion) === region.value;
-                            return (
-                                <a
-                                    key={region.value}
-                                    href={buildPublicShareUrl('booking', undefined, { query: { region: region.value } })}
-                                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${isActive ? 'bg-black text-white' : 'border border-public-border bg-white text-public-text-primary hover:border-black'}`}
-                                >
-                                    {region.label}
-                                </a>
-                            );
-                        })}
-                    </div>
+
 
                     <form className="public-booking-form space-y-5" onSubmit={handleSubmit}>
                         {/* Honeypot field - invisible to humans, visible to bots */}

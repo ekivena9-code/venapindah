@@ -1,6 +1,6 @@
 export const MOBILE_UI_SCALE_STORAGE_KEY = 'venapindah.mobile-ui-scale.v1';
 export const MOBILE_UI_SCALE_DEFAULT = 1;
-export const MOBILE_UI_SCALE_MIN = 0.8;
+export const MOBILE_UI_SCALE_MIN = 0.4;
 export const MOBILE_UI_SCALE_MAX = 1.4;
 
 export const normalizeMobileUiScale = (value: number): number => {
@@ -12,8 +12,12 @@ export const normalizeMobileUiScale = (value: number): number => {
 export const readMobileUiScale = (): number => {
     try {
         const savedValue = window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY);
-        if (savedValue === null) return MOBILE_UI_SCALE_DEFAULT;
-        return normalizeMobileUiScale(Number(savedValue));
+        if (savedValue === null || typeof savedValue !== 'string' || !savedValue.trim()) {
+            return MOBILE_UI_SCALE_DEFAULT;
+        }
+        const parsed = Number(savedValue);
+        if (!Number.isFinite(parsed)) return MOBILE_UI_SCALE_DEFAULT;
+        return normalizeMobileUiScale(parsed);
     } catch {
         return MOBILE_UI_SCALE_DEFAULT;
     }
@@ -23,6 +27,7 @@ export const applyMobileUiScale = (value: number): number => {
     const scale = normalizeMobileUiScale(value);
     if (typeof document !== 'undefined') {
         document.documentElement.style.setProperty('--mobile-ui-scale', String(scale));
+        document.documentElement.style.setProperty('--profile-mobile-ui-scale', String(scale));
     }
     return scale;
 };
