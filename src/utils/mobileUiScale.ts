@@ -1,5 +1,5 @@
 export const MOBILE_UI_SCALE_STORAGE_KEY = 'venapindah.mobile-ui-scale.v1';
-export const MOBILE_UI_SCALE_DEFAULT = 0.8;
+export const MOBILE_UI_SCALE_DEFAULT = 1;
 export const MOBILE_UI_SCALE_MIN = 0.4;
 export const MOBILE_UI_SCALE_MAX = 1.4;
 

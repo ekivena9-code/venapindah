@@ -227,20 +227,20 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
             width: 100%;
             max-width: 100%;
             min-width: 0;
-            min-height: 34px !important;
-            height: 34px !important;
-            padding: 6px 9px !important;
-            font-size: 13px !important;
+            min-height: max(34px, calc(34px * var(--mobile-ui-scale, 1))) !important;
+            height: max(34px, calc(34px * var(--mobile-ui-scale, 1))) !important;
+            padding: calc(6px * var(--mobile-ui-scale, 1)) calc(9px * var(--mobile-ui-scale, 1)) !important;
+            font-size: calc(13px * var(--mobile-ui-scale, 1)) !important;
             line-height: 1.2 !important;
-            border-radius: 8px !important;
+            border-radius: calc(8px * var(--mobile-ui-scale, 1)) !important;
           }
 
           .app-modal-dialog input.input-field,
           .app-modal-dialog select.input-field {
-            min-height: 36px !important;
-            height: 36px !important;
-            padding-top: 8px !important;
-            padding-bottom: 8px !important;
+            min-height: max(36px, calc(36px * var(--mobile-ui-scale, 1))) !important;
+            height: max(36px, calc(36px * var(--mobile-ui-scale, 1))) !important;
+            padding-top: calc(8px * var(--mobile-ui-scale, 1)) !important;
+            padding-bottom: calc(8px * var(--mobile-ui-scale, 1)) !important;
           }
 
           .app-modal-dialog textarea {
@@ -248,21 +248,21 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
             width: 100%;
             max-width: 100%;
             min-width: 0;
-            min-height: 66px !important;
+            min-height: max(66px, calc(66px * var(--mobile-ui-scale, 1))) !important;
             height: auto;
-            padding: 7px 9px !important;
-            font-size: 13px !important;
+            padding: calc(7px * var(--mobile-ui-scale, 1)) calc(9px * var(--mobile-ui-scale, 1)) !important;
+            font-size: calc(13px * var(--mobile-ui-scale, 1)) !important;
             line-height: 1.3 !important;
-            border-radius: 8px !important;
+            border-radius: calc(8px * var(--mobile-ui-scale, 1)) !important;
           }
 
           .app-modal-dialog form label {
-            font-size: 11px !important;
+            font-size: calc(14px * var(--mobile-ui-scale, 1)) !important;
             line-height: 1.25 !important;
           }
 
           .app-modal-dialog form .input-label {
-            font-size: 10px !important;
+            font-size: calc(14px * var(--mobile-ui-scale, 1)) !important;
           }
 
           .app-modal-dialog .input-group,
@@ -284,13 +284,13 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
             box-sizing: border-box;
             width: 100% !important;
             min-width: 88px;
-            min-height: 42px !important;
+            min-height: max(42px, calc(42px * var(--mobile-ui-scale, 1))) !important;
             max-height: none !important;
-            height: 42px !important;
-            padding: 0 14px !important;
-            font-size: 13.5px !important;
+            height: max(42px, calc(42px * var(--mobile-ui-scale, 1))) !important;
+            padding: 0 calc(14px * var(--mobile-ui-scale, 1)) !important;
+            font-size: calc(13.5px * var(--mobile-ui-scale, 1)) !important;
             line-height: 1.2 !important;
-            border-radius: 8px !important;
+            border-radius: calc(8px * var(--mobile-ui-scale, 1)) !important;
             white-space: normal;
           }
 
@@ -303,14 +303,14 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
             box-sizing: border-box;
             width: auto !important;
             max-width: 100%;
-            min-width: 36px !important;
-            min-height: 36px !important;
+            min-width: max(36px, calc(36px * var(--mobile-ui-scale, 1))) !important;
+            min-height: max(36px, calc(36px * var(--mobile-ui-scale, 1))) !important;
             max-height: none !important;
-            height: 36px !important;
-            padding: 0 10px !important;
-            font-size: 13px !important;
+            height: max(36px, calc(36px * var(--mobile-ui-scale, 1))) !important;
+            padding: 0 calc(10px * var(--mobile-ui-scale, 1)) !important;
+            font-size: calc(13px * var(--mobile-ui-scale, 1)) !important;
             line-height: 1.2 !important;
-            border-radius: 8px !important;
+            border-radius: calc(8px * var(--mobile-ui-scale, 1)) !important;
             white-space: nowrap;
           }
 
@@ -340,13 +340,13 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
           .app-modal-footer .button-secondary,
           .app-modal-footer button {
             box-sizing: border-box;
-            min-height: 38px !important;
+            min-height: max(38px, calc(38px * var(--mobile-ui-scale, 1))) !important;
             max-height: none !important;
-            height: 38px !important;
-            font-size: 13px !important;
+            height: max(38px, calc(38px * var(--mobile-ui-scale, 1))) !important;
+            font-size: calc(13px * var(--mobile-ui-scale, 1)) !important;
             line-height: 1.2 !important;
-            padding: 0 12px !important;
-            border-radius: 8px !important;
+            padding: 0 calc(12px * var(--mobile-ui-scale, 1)) !important;
+            border-radius: calc(8px * var(--mobile-ui-scale, 1)) !important;
           }
         }
 

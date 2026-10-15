@@ -50,9 +50,17 @@ const VendorPublicProfile: React.FC = () => {
 
     const formatWa = (phone: string) => `https://wa.me/${phone.replace(/\D/g, '')}`;
 
-    // Build unique category list
-    const categories = ['Semua', ...Array.from(new Set(portfolios.map(p => p.category).filter(Boolean)))];
-    const filteredPortfolios = activeFilter === 'Semua' ? portfolios : portfolios.filter(p => p.category === activeFilter);
+    const categoryKey = (category: string) => category.trim().toLowerCase();
+    const categoryLabels = Array.from(new Map(
+        portfolios
+            .map(portfolio => portfolio.category.trim())
+            .filter(Boolean)
+            .map(category => [categoryKey(category), category])
+    ).values());
+    const categories = ['Semua', ...categoryLabels];
+    const filteredPortfolios = activeFilter === 'Semua'
+        ? portfolios
+        : portfolios.filter(portfolio => categoryKey(portfolio.category) === categoryKey(activeFilter));
 
     // Reset showAll when filter changes
     const handleFilterChange = (cat: string) => {
@@ -340,7 +348,7 @@ const VendorPublicProfile: React.FC = () => {
                         </div>
 
                         {/* Category Filter */}
-                        {categories.length > 2 && (
+                        {categories.length > 1 && (
                             <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
                                 {categories.map(cat => (
                                     <button

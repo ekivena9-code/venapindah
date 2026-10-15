@@ -1453,16 +1453,15 @@ export const Leads: React.FC<LeadsProps> = ({
                         </div>
 
                         {/* Desktop Search + City + Source row (or mobile expanded) */}
-                        <div className={`${mobileFiltersOpen ? 'flex' : 'hidden sm:flex'} flex-col sm:flex-row gap-3 w-full`}>
-                            <div className="hidden sm:block input-group flex-grow !mt-0 w-full">
-                                <input type="search" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="input-field !rounded-lg !border !bg-brand-bg p-3 text-sm" placeholder=" " />
-                                <label className="input-label text-sm">Cari Calon Pengantin / Kota / Catatan...</label>
+                        <div className={`${mobileFiltersOpen ? 'flex' : 'hidden sm:flex'} flex-col sm:flex-row sm:items-center gap-3 w-full`}>
+                            <div className="hidden sm:block flex-1 min-w-0 !mt-0">
+                                <input type="search" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="input-field !h-12 !min-h-0 !rounded-lg !border !bg-brand-bg px-3 text-sm placeholder:text-[#5A6A85] placeholder:opacity-100 w-full" placeholder="Cari Calon Pengantin / Kota / Catatan..." />
                             </div>
-                            <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} className="input-field !rounded-lg !border !bg-brand-bg p-2.5 sm:p-3 text-xs sm:text-sm w-full sm:w-44">
+                            <select value={cityFilter} onChange={e => setCityFilter(e.target.value)} className="input-field !h-12 !min-h-0 !rounded-lg !border !bg-brand-bg px-3 py-2 text-xs sm:text-sm w-full sm:w-44">
                                 <option value="all">Semua Kota ({uniqueCities.length})</option>
                                 {uniqueCities.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
-                            <select value={sourceFilter} onChange={e => setSourceFilter(e.target.value as any)} className="input-field !rounded-lg !border !bg-brand-bg p-2.5 sm:p-3 text-xs sm:text-sm w-full sm:w-44 leads-source-filter">
+                            <select value={sourceFilter} onChange={e => setSourceFilter(e.target.value as any)} className="input-field !h-12 !min-h-0 !rounded-lg !border !bg-brand-bg px-3 py-2 text-xs sm:text-sm w-full sm:w-44 leads-source-filter">
                                 <option value="all">Semua Sumber</option>
                                 {Object.values(ContactChannel).map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
@@ -2371,7 +2370,7 @@ const ShareMessageModal: React.FC<ShareMessageModalProps> = ({ type, lead, userP
         <Modal isOpen={true} onClose={onClose} title={title} size="lg">
             <div className="space-y-4">
                 {type === 'package' && (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         {/* Selector Tab: Tautan Paket Publik per Wilayah VS Pricelist Upload */}
                         <div className="flex items-center gap-1.5 p-1 bg-[#F4F6F9] rounded-xl border border-[#EAEFF4]">
                             <button
@@ -2384,7 +2383,7 @@ const ShareMessageModal: React.FC<ShareMessageModalProps> = ({ type, lead, userP
                                 }`}
                             >
                                 <PackageIconLucide className="w-3.5 h-3.5" />
-                                <span>Katalog Paket Publik (per Wilayah)</span>
+                                <span>Paket Publik</span>
                             </button>
                             <button
                                 type="button"
@@ -2402,11 +2401,11 @@ const ShareMessageModal: React.FC<ShareMessageModalProps> = ({ type, lead, userP
 
                         {/* Mode 1: Katalog Paket Publik per Wilayah */}
                         {packageSource === 'public-packages' && (
-                            <div className="p-3.5 bg-blue-50/70 rounded-xl border border-blue-200/80 space-y-3">
+                            <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200/80 space-y-2">
                                 <div className="flex items-center justify-between flex-wrap gap-2">
                                     <span className="text-xs sm:text-sm font-bold text-[#1E3A8A] inline-flex items-center gap-1.5">
                                         <PackageIconLucide className="w-4 h-4 text-[#3563E9]" />
-                                        Tautan Paket Publik (/#/public-packages)
+                                        Paket Publik
                                     </span>
                                     <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
                                         Tersambung ke Lead ID
@@ -2414,10 +2413,10 @@ const ShareMessageModal: React.FC<ShareMessageModalProps> = ({ type, lead, userP
                                 </div>
 
                                 {/* Region Selector Tabs */}
-                                <div className="space-y-1.5">
+                                <div className="space-y-1">
                                     <div className="flex items-center justify-between">
                                         <label className="text-[11px] font-bold text-[#5A6A85] uppercase tracking-wider">
-                                            Pilih Wilayah:
+                                            Wilayah:
                                         </label>
                                         <a
                                             href={selectedPublicPackageLink}
@@ -2459,10 +2458,7 @@ const ShareMessageModal: React.FC<ShareMessageModalProps> = ({ type, lead, userP
                                 </div>
 
                                 {/* Active URL box & Quick Actions */}
-                                <div className="space-y-2 bg-white p-2.5 rounded-xl border border-blue-100">
-                                    <p className="text-[11px] text-[#475569] font-mono break-all bg-[#F9FBFC] p-2 rounded-lg border border-[#EAEFF4] select-all">
-                                        {selectedPublicPackageLink}
-                                    </p>
+                                <div className="bg-white p-2 rounded-xl border border-blue-100">
                                     <div className="flex gap-2">
                                         <button
                                             type="button"
@@ -2488,11 +2484,11 @@ const ShareMessageModal: React.FC<ShareMessageModalProps> = ({ type, lead, userP
 
                         {/* Mode 2: Pricelist Upload */}
                         {packageSource === 'gallery' && (
-                            <div className="p-3.5 bg-blue-50/70 rounded-xl border border-blue-200/80 space-y-2.5">
+                            <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-200/80 space-y-2">
                                 <div className="flex items-center justify-between flex-wrap gap-2">
                                     <span className="text-xs sm:text-sm font-bold text-[#1E3A8A] inline-flex items-center gap-1.5">
                                         <LinkIcon className="w-4 h-4 text-[#3563E9]" />
-                                        Pricelist dari Menu Pricelist Upload
+                                        Pricelist
                                     </span>
                                     <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300">
                                         Tersambung ke Lead ID
@@ -2532,14 +2528,6 @@ const ShareMessageModal: React.FC<ShareMessageModalProps> = ({ type, lead, userP
                                                 </button>
                                             </div>
                                         </div>
-                                        {selectedGalleryLink && (
-                                            <p className="text-[11px] text-[#475569] font-mono break-all bg-white p-2 rounded-lg border border-blue-100 select-all">
-                                                {selectedGalleryLink}
-                                            </p>
-                                        )}
-                                        <p className="text-[11px] text-[#334155] leading-relaxed">
-                                            💡 Tautan di atas diambil dari menu <strong>Pricelist Upload</strong> dan menyertakan ID calon pengantin (<strong>{lead.name}</strong>). Saat calon pengantin membuka & menekan tombol booking di Pricelist ini, status calon pengantin akan otomatis terkonversi akurat.
-                                        </p>
                                     </>
                                 ) : (
                                     <div className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-200">

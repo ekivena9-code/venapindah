@@ -85,6 +85,10 @@ describe('UiTextCustomizationPanel', () => {
 
     it('saves the mobile text scale to Supabase only after the user clicks save', async () => {
         render(<UiTextCustomizationPanel />);
+        let finishRemoteSave: ((scale: number) => void) | undefined;
+        mobileScaleMocks.saveRemoteMobileUiScale.mockImplementationOnce(scale => new Promise(resolve => {
+            finishRemoteSave = resolve;
+        }));
 
         fireEvent.change(screen.getByRole('slider', { name: 'Ukuran teks dan tampilan mobile' }), {
             target: { value: '1.25' },
@@ -96,6 +100,9 @@ describe('UiTextCustomizationPanel', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
 
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBeNull();
+        expect(screen.getByText('Menyimpan...')).not.toBeNull();
+        finishRemoteSave?.(1.25);
         await waitFor(() => expect(mobileScaleMocks.saveRemoteMobileUiScale).toHaveBeenCalledWith(1.25));
         expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1.25');
         expect(screen.getByText('Preferensi disimpan ke akun Supabase ini.')).not.toBeNull();
@@ -103,7 +110,7 @@ describe('UiTextCustomizationPanel', () => {
 
     it('resets the applied scale immediately and persists the default only after save', async () => {
         window.localStorage.setItem(MOBILE_UI_SCALE_STORAGE_KEY, '1.25');
-        render(<UiTextCustomizationPanel />);
+        const { unmount } = render(<UiTextCustomizationPanel />);
 
         fireEvent.click(screen.getByRole('button', { name: 'Reset 100%' }));
 
@@ -115,6 +122,14 @@ describe('UiTextCustomizationPanel', () => {
 
         await waitFor(() => expect(mobileScaleMocks.saveRemoteMobileUiScale).toHaveBeenCalledWith(1));
         expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1');
+        unmount();
+
+        mobileScaleMocks.loadRemoteMobileUiScale.mockResolvedValueOnce(1);
+        render(<UiTextCustomizationPanel />);
+        await waitFor(() => {
+            expect(screen.getByText('100%')).not.toBeNull();
+            expect(document.documentElement.style.getPropertyValue('--mobile-ui-scale')).toBe('1');
+        });
     });
 
     it('reports remote persistence errors without marking the preference as saved', async () => {
@@ -128,6 +143,7 @@ describe('UiTextCustomizationPanel', () => {
 
         expect((await screen.findByRole('alert')).textContent).toContain('Kolom belum tersedia.');
         expect((screen.getByRole('button', { name: 'Simpan skala mobile' }) as HTMLButtonElement).disabled).toBe(false);
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBeNull();
     });
 
     it('applies the user-controlled mobile scale in the app stylesheet', () => {
@@ -150,7 +166,8 @@ describe('UiTextCustomizationPanel', () => {
         expect(mobileOverrides).toContain('.stat-card-value,');
         expect(mobileOverrides).toContain('button[class*="text-"]');
         expect(mobileOverrides).toContain('button svg,');
-        expect(mobileOverrides).toContain('width: max(16px, calc(16px * var(--mobile-ui-scale, 1))) !important;');
+        expect(mobileOverrides).toContain('width: calc(16px * var(--mobile-ui-scale, 1)) !important;');
+        expect(mobileOverrides).not.toContain('width: max(16px, calc(16px * var(--mobile-ui-scale, 1))) !important;');
         expect(mobileOverrides).toContain('button[class*="text-"]:has(svg)');
         expect(mobileOverrides).toContain(':not([class*="flex-col"]):not(.dashboard-action-card):not(.finance-add-pocket-card)');
         const iconButtonRuleStart = mobileOverrides.indexOf('button[class*="text-"]:has(svg)');
@@ -166,19 +183,29 @@ describe('UiTextCustomizationPanel', () => {
         expect(mobileOverrides).toContain('button[class*="w-11"][class*="h-6"]');
         expect(mobileOverrides).toContain('width: calc(44px * var(--mobile-ui-scale, 1)) !important;');
         expect(mobileOverrides).toContain('min-height: max(44px, calc(40px * var(--mobile-ui-scale, 1))) !important;');
-        expect(mobileOverrides).toContain('width: max(16px, calc(16px * var(--mobile-ui-scale, 1))) !important;');
+        expect(mobileOverrides).toContain('width: calc(16px * var(--mobile-ui-scale, 1)) !important;');
+        expect(mobileOverrides).not.toContain('width: max(16px, calc(16px * var(--mobile-ui-scale, 1))) !important;');
         expect(mobileOverrides).toContain('a[class*="flex"]');
         expect(mobileOverrides).toContain('nav[aria-label="breadcrumb"] a');
         expect(mobileOverrides).toContain('button[class*="w-11"][class*="h-6"]::after');
         expect(mobileOverrides).toContain('button > span:not([class*="text-"])');
         expect(mobileOverrides).toContain('[role="dialog"] .grid.grid-cols-2 > div p.text-2xl.font-bold');
-        expect(mobileOverrides).toContain('font-size: clamp(9px, calc(9px * var(--mobile-ui-scale, 1)), 11px) !important;');
+        expect(mobileOverrides).toContain('font-size: calc(9px * var(--mobile-ui-scale, 1)) !important;');
+        expect(mobileOverrides).not.toContain('font-size: max(9px, calc(9px * var(--mobile-ui-scale, 1))) !important;');
         expect(mobileOverrides).toContain('.dashboard-action-card > div:last-child p:first-child');
         expect(mobileOverrides).toContain('p.text-xs.font-semibold.truncate');
             expect(mobileOverrides).toContain('textarea.input-field,');
             expect(mobileOverrides).toContain('#modal-title:empty');
         expect(mobileOverrides).toContain('html { font-size: 16px !important; }');
         expect(mobileOverrides).not.toContain('calc(0.75rem * var(--mobile-ui-scale, 1))');
+        expect(css).toContain('font-size: calc(0.62rem * var(--mobile-ui-scale, 1)) !important;');
+        expect(css).toContain('font-size: calc(0.58rem * var(--mobile-ui-scale, 1)) !important;');
+    });
+
+    it('keeps the invoice list in the mobile scale scope', () => {
+        const app = fs.readFileSync(`${process.cwd()}/src/App.tsx`, 'utf8');
+
+        expect(app).not.toContain('data-mobile-ui-scale-excluded={routing.activeView === ViewType.INVOICES');
     });
 
     it('keeps labels above inputs instead of floating inside the field box', () => {
@@ -225,7 +252,26 @@ describe('UiTextCustomizationPanel', () => {
         });
     });
 
-    it('falls back to local persistence cleanly when remote session is absent', async () => {
+    it('loads the saved remote scale again after the settings panel is reopened', async () => {
+        const { unmount } = render(<UiTextCustomizationPanel />);
+        fireEvent.change(screen.getByRole('slider', { name: 'Ukuran teks dan tampilan mobile' }), {
+            target: { value: '1.25' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
+
+        await waitFor(() => expect(screen.getByText('Preferensi disimpan ke akun Supabase ini.')).not.toBeNull());
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1.25');
+        unmount();
+
+        mobileScaleMocks.loadRemoteMobileUiScale.mockResolvedValueOnce(1.25);
+        render(<UiTextCustomizationPanel />);
+        await waitFor(() => {
+            expect(screen.getByText('125%')).not.toBeNull();
+            expect(document.documentElement.style.getPropertyValue('--mobile-ui-scale')).toBe('1.25');
+        });
+    });
+
+    it('does not report success or persist locally when the remote session is absent', async () => {
         mobileScaleMocks.saveRemoteMobileUiScale.mockResolvedValueOnce(undefined);
         render(<UiTextCustomizationPanel />);
 
@@ -234,10 +280,9 @@ describe('UiTextCustomizationPanel', () => {
         });
         fireEvent.click(screen.getByRole('button', { name: 'Simpan skala mobile' }));
 
-        await waitFor(() => {
-            expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBe('1.4');
-            expect(screen.getByText('Preferensi disimpan di browser ini.')).not.toBeNull();
-        });
-        expect((screen.getByRole('button', { name: 'Simpan skala mobile' }) as HTMLButtonElement).disabled).toBe(true);
+        expect((await screen.findByRole('alert')).textContent).toContain('tidak mengembalikan hasil penyimpanan');
+        expect(window.localStorage.getItem(MOBILE_UI_SCALE_STORAGE_KEY)).toBeNull();
+        expect(screen.queryByText('Preferensi disimpan di browser ini.')).toBeNull();
+        expect((screen.getByRole('button', { name: 'Simpan skala mobile' }) as HTMLButtonElement).disabled).toBe(false);
     });
 });

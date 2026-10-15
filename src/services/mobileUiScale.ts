@@ -1,38 +1,37 @@
 import { isSupabaseConfigured, supabase } from '../lib/supabaseClient';
 import {
-    applyMobileUiScale,
     MOBILE_UI_SCALE_DEFAULT,
     normalizeMobileUiScale,
-    readMobileUiScale,
     saveMobileUiScale,
 } from '../utils/mobileUiScale';
 
 export const MOBILE_UI_SCALE_SYNC_EVENT = 'venapindah-mobile-ui-scale-sync';
 
 /** Load the scale stored in the `profiles` table for the current user. */
-export async function loadRemoteMobileUiScale(): Promise<number | null | undefined> {
+export async function loadRemoteMobileUiScale(): Promise<number | undefined> {
     if (!isSupabaseConfigured) return undefined;
 
     try {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !sessionData?.session) return undefined;
+        if (sessionError) throw sessionError;
+        if (!sessionData?.session) return undefined;
 
         const { data, error } = await supabase
             .from('profiles')
             .select('mobile_ui_scale')
-            .limit(1)
+            .eq('admin_user_id', sessionData.session.user.id)
             .maybeSingle();
         if (error) {
-            if (error.code === 'PGRST116') return undefined; // no profile row yet
+            if (error.code === 'PGRST116') return MOBILE_UI_SCALE_DEFAULT;
             throw error;
         }
-        if (!data) return undefined; // profile not yet created
+        if (!data) return MOBILE_UI_SCALE_DEFAULT;
 
         const value = data.mobile_ui_scale;
-        if (value === null || value === undefined) return null;
+        if (value === null || value === undefined) return MOBILE_UI_SCALE_DEFAULT;
 
         const scale = Number(value);
-        if (!Number.isFinite(scale)) return null;
+        if (!Number.isFinite(scale)) return MOBILE_UI_SCALE_DEFAULT;
         return normalizeMobileUiScale(scale);
     } catch (err: any) {
         if (err?.name === 'AuthSessionMissingError' || err?.message?.includes('Auth session missing')) {
@@ -49,7 +48,7 @@ export async function saveRemoteMobileUiScale(value: number): Promise<number | u
 
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
     if (sessionError) throw sessionError;
-    if (!sessionData?.session) return undefined;
+    if (!sessionData?.session) throw new Error('Sesi akun Supabase tidak ditemukan.');
 
     const userId = sessionData.session.user.id;
 
@@ -57,16 +56,12 @@ export async function saveRemoteMobileUiScale(value: number): Promise<number | u
     // RLS ensures we can only update the current user's own row.
     const { data, error } = await supabase
         .from('profiles')
-        .update({ mobile_ui_scale: scale === MOBILE_UI_SCALE_DEFAULT ? null : scale })
+        .update({ mobile_ui_scale: scale })
         .eq('admin_user_id', userId)
         .select('mobile_ui_scale')
         .maybeSingle();
     if (error) throw error;
-    // No matching row — profile may not exist yet; warn and return undefined without throwing.
-    if (!data) {
-        console.warn('[MobileUiScale] No profile row found for current user; scale preference not saved.');
-        return undefined;
-    }
+    if (!data) throw new Error('Profil akun tidak ditemukan; preferensi tidak disimpan.');
 
     const savedScale = data.mobile_ui_scale;
     return savedScale !== null && savedScale !== undefined
@@ -78,22 +73,7 @@ export async function saveRemoteMobileUiScale(value: number): Promise<number | u
 export async function syncRemoteMobileUiScale(): Promise<number | null> {
     const remoteScale = await loadRemoteMobileUiScale();
     if (remoteScale === undefined) return null;
-
-    if (remoteScale === null) {
-        // No remote preference yet — push the local one up if it differs from default.
-        const localScale = readMobileUiScale();
-        if (localScale !== MOBILE_UI_SCALE_DEFAULT) {
-            try {
-                await saveRemoteMobileUiScale(localScale);
-                return localScale;
-            } catch (err) {
-                console.warn('[MobileUiScale] Failed to push local scale to remote:', err);
-            }
-        }
-        return null;
-    }
-
-    const appliedScale = saveMobileUiScale(applyMobileUiScale(remoteScale));
+    const appliedScale = saveMobileUiScale(remoteScale);
     window.dispatchEvent(new CustomEvent(MOBILE_UI_SCALE_SYNC_EVENT, { detail: appliedScale }));
     return appliedScale;
 }

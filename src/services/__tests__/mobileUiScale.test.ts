@@ -4,6 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const fromMock = vi.fn();
 const getSessionMock = vi.fn();
+type MobileScaleMockResult = {
+  data: { mobile_ui_scale: number | null } | null;
+  error: { message?: string; code?: string } | null;
+};
 
 vi.mock('../../lib/supabaseClient', () => ({
   isSupabaseConfigured: true,
@@ -29,17 +33,14 @@ const VALID_SESSION = {
 
 // Helper to build a chainable from() mock for .select().limit().maybeSingle()
 function makeSelectChain(resolvedValue: { data: any; error: any }) {
+  const eqMock = vi.fn(() => ({ maybeSingle: async () => resolvedValue }));
   return {
+    eqMock,
     select: () => ({
       limit: () => ({
         maybeSingle: async () => resolvedValue,
       }),
-      eq: () => ({
-        maybeSingle: async () => resolvedValue,
-        select: () => ({
-          maybeSingle: async () => resolvedValue,
-        }),
-      }),
+      eq: eqMock,
     }),
   };
 }
@@ -70,20 +71,29 @@ describe('loadRemoteMobileUiScale', () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns null when profile row exists but mobile_ui_scale is NULL', async () => {
+  it('propagates session errors so the settings UI can report a load failure', async () => {
+    const sessionError = new Error('Session request failed.');
+    getSessionMock.mockResolvedValue({ data: { session: null }, error: sessionError });
+    const { loadRemoteMobileUiScale } = await import('../mobileUiScale');
+    await expect(loadRemoteMobileUiScale()).rejects.toBe(sessionError);
+  });
+
+  it('returns the default when profile row exists but mobile_ui_scale is NULL', async () => {
     getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
     fromMock.mockReturnValue(makeSelectChain({ data: { mobile_ui_scale: null }, error: null }));
     const { loadRemoteMobileUiScale } = await import('../mobileUiScale');
     const result = await loadRemoteMobileUiScale();
-    expect(result).toBeNull();
+    expect(result).toBe(1);
   });
 
-  it('returns undefined when no profile row exists', async () => {
+  it('returns the default when no profile row exists for the authenticated account', async () => {
     getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
-    fromMock.mockReturnValue(makeSelectChain({ data: null, error: null }));
+    const chain = makeSelectChain({ data: null, error: null });
+    fromMock.mockReturnValue(chain);
     const { loadRemoteMobileUiScale } = await import('../mobileUiScale');
     const result = await loadRemoteMobileUiScale();
-    expect(result).toBeUndefined();
+    expect(result).toBe(1);
+    expect(chain.eqMock).toHaveBeenCalledWith('admin_user_id', 'user-uuid-1');
   });
 
   it('returns a normalized number when column has a valid value', async () => {
@@ -112,63 +122,59 @@ describe('saveRemoteMobileUiScale', () => {
 
   it('calls update with the given scale value', async () => {
     getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
-    const updateFn = vi.fn().mockReturnValue({
-      eq: () => ({
-        select: () => ({
-          maybeSingle: async () => ({ data: { mobile_ui_scale: 0.8 }, error: null }),
-        }),
+    const successfulUpdate: MobileScaleMockResult = { data: { mobile_ui_scale: 0.8 }, error: null };
+    const eqMock = vi.fn((_column: string, _value: string) => ({
+      select: () => ({
+        maybeSingle: async (): Promise<typeof successfulUpdate> => successfulUpdate,
       }),
+    }));
+    const updateFn = vi.fn().mockReturnValue({
+      eq: eqMock,
     });
     fromMock.mockReturnValue({ update: updateFn });
     const { saveRemoteMobileUiScale } = await import('../mobileUiScale');
     const result = await saveRemoteMobileUiScale(0.8);
     expect(updateFn).toHaveBeenCalledWith({ mobile_ui_scale: 0.8 });
+    expect(eqMock).toHaveBeenCalledWith('admin_user_id', 'user-uuid-1');
     expect(result).toBe(0.8);
   });
 
-  it('saves null to the profiles table when scale is the default (1.0)', async () => {
+  it('persists the default scale explicitly as 1.0', async () => {
     getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
+    const defaultUpdate: MobileScaleMockResult = { data: { mobile_ui_scale: null }, error: null };
     const updateFn = vi.fn().mockReturnValue({
       eq: () => ({
         select: () => ({
-          maybeSingle: async () => ({ data: { mobile_ui_scale: null }, error: null }),
+          maybeSingle: async (): Promise<typeof defaultUpdate> => defaultUpdate,
         }),
       }),
     });
     fromMock.mockReturnValue({ update: updateFn });
     const { saveRemoteMobileUiScale } = await import('../mobileUiScale');
     const result = await saveRemoteMobileUiScale(1.0);
-    expect(updateFn).toHaveBeenCalledWith({ mobile_ui_scale: null });
-    // null in DB means default 1.0
+    expect(updateFn).toHaveBeenCalledWith({ mobile_ui_scale: 1 });
     expect(result).toBe(1.0);
   });
 
-  it('returns undefined when there is no session', async () => {
+  it('rejects when there is no session instead of claiming a successful save', async () => {
     getSessionMock.mockResolvedValue({ data: { session: null }, error: null });
     const { saveRemoteMobileUiScale } = await import('../mobileUiScale');
-    const result = await saveRemoteMobileUiScale(0.8);
-    expect(result).toBeUndefined();
+    await expect(saveRemoteMobileUiScale(0.8)).rejects.toThrow('Sesi akun Supabase tidak ditemukan.');
   });
 
-  it('returns undefined (does not throw) when profile row does not exist', async () => {
+  it('rejects when no profile row matches the authenticated account', async () => {
     getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
+    const missingProfile: MobileScaleMockResult = { data: null, error: null };
     const updateFn = vi.fn().mockReturnValue({
       eq: () => ({
         select: () => ({
-          maybeSingle: async () => ({ data: null, error: null }),
+          maybeSingle: async (): Promise<typeof missingProfile> => missingProfile,
         }),
       }),
     });
     fromMock.mockReturnValue({ update: updateFn });
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { saveRemoteMobileUiScale } = await import('../mobileUiScale');
-    // Must not throw — returns undefined instead
-    await expect(saveRemoteMobileUiScale(0.8)).resolves.toBeUndefined();
-    // Must log a warning so silent failures are observable
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      '[MobileUiScale] No profile row found for current user; scale preference not saved.',
-    );
-    consoleWarnSpy.mockRestore();
+    await expect(saveRemoteMobileUiScale(0.8)).rejects.toThrow('Profil akun tidak ditemukan; preferensi tidak disimpan.');
   });
 });
 
@@ -202,32 +208,15 @@ describe('syncRemoteMobileUiScale', () => {
     expect(dispatchEventSpy).not.toHaveBeenCalled();
   });
 
-  it('logs a warning and returns null when sync-up errors on first device', async () => {
-    // remote is null (no stored preference), local scale differs from default
+  it('applies the account default instead of uploading a stale local value', async () => {
     localStorage.setItem('venapindah.mobile-ui-scale.v1', '0.85');
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     getSessionMock.mockResolvedValue({ data: VALID_SESSION, error: null });
-    // loadRemoteMobileUiScale: returns null (no preference stored yet)
     fromMock.mockReturnValueOnce(makeSelectChain({ data: { mobile_ui_scale: null }, error: null }));
-    // saveRemoteMobileUiScale: update fails (e.g., network error)
-    fromMock.mockReturnValueOnce({
-      update: () => ({
-        eq: () => ({
-          select: () => ({
-            maybeSingle: async () => ({ data: null, error: { message: 'network error', code: 'net' } }),
-          }),
-        }),
-      }),
-    });
     const { syncRemoteMobileUiScale } = await import('../mobileUiScale');
     const result = await syncRemoteMobileUiScale();
-    // Should not throw — returns null on failure
-    expect(result).toBeNull();
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      '[MobileUiScale] Failed to push local scale to remote:',
-      expect.anything(),
-    );
-    consoleWarnSpy.mockRestore();
+    expect(result).toBe(1);
+    expect(fromMock).toHaveBeenCalledOnce();
+    expect(localStorage.getItem('venapindah.mobile-ui-scale.v1')).toBe('1');
     localStorage.removeItem('venapindah.mobile-ui-scale.v1');
   });
 });

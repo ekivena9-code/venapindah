@@ -1542,26 +1542,26 @@ body {
 
 @media (max-width: 768px) {
   /* ── 1. TYPOGRAPHY & TEXT (Kecil 1 Tingkat Proporsional di Mobile) ── */
-  h1 { font-size: 0.90rem !important; line-height: 1.2 !important; letter-spacing: -0.015em !important; }
-  h2 { font-size: 0.82rem !important; line-height: 1.25 !important; letter-spacing: -0.01em !important; }
-  h3 { font-size: 0.75rem !important; line-height: 1.25 !important; letter-spacing: -0.01em !important; }
-  h4 { font-size: 0.68rem !important; line-height: 1.3 !important; }
-  h5, h6 { font-size: 0.64rem !important; line-height: 1.3 !important; }
+  h1 { font-size: calc(0.90rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.2 !important; letter-spacing: -0.015em !important; }
+  h2 { font-size: calc(0.82rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.25 !important; letter-spacing: -0.01em !important; }
+  h3 { font-size: calc(0.75rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.25 !important; letter-spacing: -0.01em !important; }
+  h4 { font-size: calc(0.68rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.3 !important; }
+  h5, h6 { font-size: calc(0.64rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.3 !important; }
 
-  .text-3xl { font-size: 0.90rem !important; line-height: 1.2 !important; letter-spacing: -0.015em !important; }
-  .text-2xl { font-size: 0.82rem !important; line-height: 1.25 !important; letter-spacing: -0.01em !important; }
-  .text-xl  { font-size: 0.75rem !important; line-height: 1.25 !important; }
-  .text-lg  { font-size: 0.68rem !important; line-height: 1.3 !important; }
-  .text-base{ font-size: 0.64rem !important; line-height: 1.35 !important; }
-  .text-sm  { font-size: 0.58rem !important; line-height: 1.3 !important; }
-  .text-xs  { font-size: 0.54rem !important; line-height: 1.25 !important; }
-  .text-\[15px\], .text-\[14px\] { font-size: 0.62rem !important; line-height: 1.3 !important; }
-  .text-\[13px\], .text-\[12px\] { font-size: 0.56rem !important; line-height: 1.25 !important; }
-  .text-\[11px\], .text-\[10px\] { font-size: 0.51rem !important; line-height: 1.2 !important; }
-  .text-\[9px\], .text-\[8px\]   { font-size: 0.48rem !important; line-height: 1.15 !important; }
+  .text-3xl { font-size: calc(0.90rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.2 !important; letter-spacing: -0.015em !important; }
+  .text-2xl { font-size: calc(0.82rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.25 !important; letter-spacing: -0.01em !important; }
+  .text-xl  { font-size: calc(0.75rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.25 !important; }
+  .text-lg  { font-size: calc(0.68rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.3 !important; }
+  .text-base{ font-size: calc(0.64rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.35 !important; }
+  .text-sm  { font-size: calc(0.58rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.3 !important; }
+  .text-xs  { font-size: calc(0.54rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.25 !important; }
+  .text-\[15px\], .text-\[14px\] { font-size: calc(0.62rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.3 !important; }
+  .text-\[13px\], .text-\[12px\] { font-size: calc(0.56rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.25 !important; }
+  .text-\[11px\], .text-\[10px\] { font-size: calc(0.51rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.2 !important; }
+  .text-\[9px\], .text-\[8px\]   { font-size: calc(0.48rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.15 !important; }
 
   /* ── 2. NUMBER, CURRENCY, PERCENTAGE & STAT CARDS (Kompak, Tabular, Tanpa Terpotong) ── */
-  [class*="text-4xl"], [class*="text-5xl"] { font-size: 0.98rem !important; line-height: 1.15 !important; letter-spacing: -0.02em !important; }
+  [class*="text-4xl"], [class*="text-5xl"] { font-size: calc(0.98rem * var(--mobile-ui-scale, 1)) !important; line-height: 1.15 !important; letter-spacing: -0.02em !important; }
   .tabular-nums, .amount, .currency-amount, .font-black.text-xl, .font-black.text-2xl, .font-extrabold.text-xl, .font-extrabold.text-2xl, .font-bold.text-xl, .font-bold.text-2xl {
     font-variant-numeric: tabular-nums !important;
     letter-spacing: -0.02em !important;
@@ -1589,12 +1589,12 @@ body {
   .input-field,
   select.input-field,
   .input-with-icon input {
-    min-height: 38px !important; /* Touch target optimal 38px */
+    min-height: max(38px, calc(38px * var(--mobile-ui-scale, 1))) !important; /* Touch target optimal 38px */
     height: auto;
-    padding: 0.35rem 10px !important; /* Padding horizontal 10px */
-    font-size: 13.5px !important; /* Font 13.5px */
+    padding: calc(0.35rem * var(--mobile-ui-scale, 1)) calc(10px * var(--mobile-ui-scale, 1)) !important; /* Padding horizontal 10px */
+    font-size: calc(13.5px * var(--mobile-ui-scale, 1)) !important; /* Font 13.5px */
     line-height: 1.25 !important;
-    border-radius: 8px !important;
+    border-radius: calc(8px * var(--mobile-ui-scale, 1)) !important;
     border-width: 1px !important;
   }
 
@@ -1608,13 +1608,13 @@ body {
 
   /* Floating label inputs khusus */
   .input-field {
-    min-height: 40px !important; /* Sedikit lebih tinggi untuk mengakomodasi floating label */
-    padding: 1rem 10px 0.2rem !important;
-    font-size: 13.5px !important;
+    min-height: max(40px, calc(40px * var(--mobile-ui-scale, 1))) !important; /* Sedikit lebih tinggi untuk mengakomodasi floating label */
+    padding: calc(1rem * var(--mobile-ui-scale, 1)) calc(10px * var(--mobile-ui-scale, 1)) calc(0.2rem * var(--mobile-ui-scale, 1)) !important;
+    font-size: calc(13.5px * var(--mobile-ui-scale, 1)) !important;
   }
 
   textarea, textarea.input-field {
-    min-height: 72px !important; /* Textarea 72px */
+    min-height: max(72px, calc(72px * var(--mobile-ui-scale, 1))) !important; /* Textarea 72px */
   }
 
   .input-group {
@@ -1644,7 +1644,7 @@ body {
     display: block !important;
     width: 100% !important;
     margin-bottom: 0 !important;
-    font-size: 12px !important;
+    font-size: calc(12px * var(--mobile-ui-scale, 1)) !important;
     line-height: 1.2 !important;
     white-space: normal !important;
   }
@@ -1660,11 +1660,11 @@ body {
     transform: none !important;
     top: auto !important;
     left: auto !important;
-    font-size: 12px !important;
+    font-size: calc(12px * var(--mobile-ui-scale, 1)) !important;
   }
 
   .input-helper-text {
-    font-size: 0.52rem !important;
+    font-size: calc(0.52rem * var(--mobile-ui-scale, 1)) !important;
     line-height: 1.25 !important;
     padding: 0.2rem 0.4rem 0 !important;
   }
@@ -1684,19 +1684,19 @@ body {
   .btn-success,
   .btn-outline,
   .btn-ghost {
-    min-height: 25px !important;
+    min-height: max(25px, calc(25px * var(--mobile-ui-scale, 1))) !important;
     height: auto !important;
-    max-height: 30px !important;
-    padding-top: 0.2rem !important;
-    padding-bottom: 0.2rem !important;
-    padding-left: 0.48rem !important;
-    padding-right: 0.48rem !important;
-    font-size: 0.58rem !important;
+    max-height: max(30px, calc(30px * var(--mobile-ui-scale, 1))) !important;
+    padding-top: calc(0.2rem * var(--mobile-ui-scale, 1)) !important;
+    padding-bottom: calc(0.2rem * var(--mobile-ui-scale, 1)) !important;
+    padding-left: calc(0.48rem * var(--mobile-ui-scale, 1)) !important;
+    padding-right: calc(0.48rem * var(--mobile-ui-scale, 1)) !important;
+    font-size: calc(0.58rem * var(--mobile-ui-scale, 1)) !important;
     font-weight: 600 !important;
     line-height: 1.15 !important;
     letter-spacing: 0 !important;
     gap: 0.2rem !important;
-    border-radius: 6px !important;
+    border-radius: calc(6px * var(--mobile-ui-scale, 1)) !important;
     box-sizing: border-box !important;
     touch-action: manipulation;
   }
@@ -1709,10 +1709,10 @@ body {
   .button-success svg,
   .btn-primary svg,
   .btn-secondary svg {
-    width: 11.5px !important;
-    height: 11.5px !important;
-    max-width: 11.5px !important;
-    max-height: 11.5px !important;
+    width: calc(11.5px * var(--mobile-ui-scale, 1)) !important;
+    height: calc(11.5px * var(--mobile-ui-scale, 1)) !important;
+    max-width: calc(11.5px * var(--mobile-ui-scale, 1)) !important;
+    max-height: calc(11.5px * var(--mobile-ui-scale, 1)) !important;
     flex-shrink: 0 !important;
   }
 
@@ -1736,7 +1736,7 @@ body {
   }
 
   #root .more-menu-sheet .more-menu-item-label {
-    font-size: 0.68rem !important;
+    font-size: calc(0.68rem * var(--mobile-ui-scale, 1)) !important;
     line-height: 1.2 !important;
   }
 
@@ -1751,7 +1751,7 @@ body {
   }
 
   #root button.dashboard-action-card {
-    min-height: 44px !important;
+    min-height: max(39px, calc(39px * var(--mobile-ui-scale, 1))) !important;
     max-height: none !important;
     height: auto !important;
     padding: 0.35rem 0.5rem !important;
@@ -1781,13 +1781,13 @@ body {
   }
 
   .dashboard-action-card > div:last-child p:first-child {
-    font-size: 0.55rem !important;
+    font-size: calc(0.55rem * var(--mobile-ui-scale, 1)) !important;
     line-height: 1.2 !important;
     overflow-wrap: anywhere;
   }
 
   .dashboard-action-card > div:last-child p:last-child {
-    font-size: 0.72rem !important;
+    font-size: calc(0.72rem * var(--mobile-ui-scale, 1)) !important;
     line-height: 1.2 !important;
     overflow-wrap: anywhere;
   }
@@ -2122,7 +2122,7 @@ body {
   }
 
   .app-modal-dialog #modal-title {
-    font-size: 0.68rem !important;
+    font-size: calc(0.95rem * var(--mobile-ui-scale, 1)) !important;
     line-height: 1.25 !important;
     font-weight: 700 !important;
   }
@@ -2197,23 +2197,23 @@ body {
   }
 
   .app-modal-dialog .text-xl {
-    font-size: 0.72rem !important;
+    font-size: calc(0.72rem * var(--mobile-ui-scale, 1)) !important;
   }
 
   .app-modal-dialog .text-lg {
-    font-size: 0.66rem !important;
+    font-size: calc(0.66rem * var(--mobile-ui-scale, 1)) !important;
   }
 
   .app-modal-dialog .text-base {
-    font-size: 0.62rem !important;
+    font-size: calc(0.62rem * var(--mobile-ui-scale, 1)) !important;
   }
 
   .app-modal-dialog .text-sm {
-    font-size: 0.56rem !important;
+    font-size: calc(0.56rem * var(--mobile-ui-scale, 1)) !important;
   }
 
   .app-modal-dialog .text-xs {
-    font-size: 0.52rem !important;
+    font-size: calc(0.52rem * var(--mobile-ui-scale, 1)) !important;
   }
 
   .app-modal-dialog form.form-compact .text-2xl {
@@ -2703,7 +2703,7 @@ select.bg-zinc-800 {
   }
 
   #root .public-lead-form-page form button[type="submit"] {
-    min-height: 44px !important;
+    min-height: 39px !important;
     max-height: none !important;
     height: auto !important;
     padding: 0.7rem 1rem !important;
@@ -2713,8 +2713,8 @@ select.bg-zinc-800 {
 }
 
 @media (max-width: 640px) {
-  :is(#root, body) .mobile-touch-target {
-    min-height: 44px !important;
+  :is(#root, body) button.mobile-touch-target {
+    min-height: 39px !important;
     max-height: none !important;
     height: auto !important;
     padding-top: 0.5rem !important;
@@ -2723,14 +2723,14 @@ select.bg-zinc-800 {
     line-height: 1.25 !important;
   }
 
-  :is(#root, body) .mobile-touch-target-icon {
+  :is(#root, body) button.mobile-touch-target-icon {
     display: inline-flex !important;
-    width: 44px !important;
-    min-width: 44px !important;
-    max-width: 44px !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
+    width: 39px !important;
+    min-width: 39px !important;
+    max-width: 39px !important;
+    height: 39px !important;
+    min-height: 39px !important;
+    max-height: 39px !important;
     padding: 0 !important;
   }
 

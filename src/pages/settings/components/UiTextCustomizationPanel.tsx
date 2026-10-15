@@ -12,6 +12,7 @@ import {
     MOBILE_UI_SCALE_DEFAULT,
     MOBILE_UI_SCALE_MAX,
     MOBILE_UI_SCALE_MIN,
+    normalizeMobileUiScale,
     readMobileUiScale,
     saveMobileUiScale,
 } from '../../../utils/mobileUiScale';
@@ -45,6 +46,7 @@ const UiTextCustomizationPanel: React.FC = () => {
     const [mobileUiScale, setMobileUiScale] = useState(savedMobileUiScale);
     const [savingMobileScale, setSavingMobileScale] = useState(false);
     const [mobileScaleError, setMobileScaleError] = useState<string | null>(null);
+    const [mobileScaleLoadError, setMobileScaleLoadError] = useState<string | null>(null);
     const [mobileScaleMessage, setMobileScaleMessage] = useState<string | null>(null);
     const [draft, setDraft] = useState<UiTextOverrides>(savedOverrides);
     const [lastSavedGroup, setLastSavedGroup] = useState<string | null>(null);
@@ -68,12 +70,14 @@ const UiTextCustomizationPanel: React.FC = () => {
         if (isSupabaseConfigured && typeof loadRemoteMobileUiScale === 'function') {
             loadRemoteMobileUiScale().then(remoteScale => {
                 if (!isMounted || mobileScaleEditedRef.current) return;
-                if (remoteScale !== null && remoteScale !== undefined) {
+                if (remoteScale !== undefined) {
                     setSavedMobileUiScale(remoteScale);
                     setMobileUiScale(remoteScale);
                     saveMobileUiScale(remoteScale);
                 }
-            }).catch(() => {});
+            }).catch(error => {
+                if (isMounted) setMobileScaleLoadError(error instanceof Error ? error.message : 'Preferensi gagal dimuat dari Supabase.');
+            });
         }
 
         return () => {
@@ -116,23 +120,23 @@ const UiTextCustomizationPanel: React.FC = () => {
     };
 
     const saveMobileScale = async () => {
-        const nextScale = saveMobileUiScale(mobileUiScale);
+        const nextScale = normalizeMobileUiScale(mobileUiScale);
         setSavingMobileScale(true);
         setMobileScaleError(null);
+        setMobileScaleLoadError(null);
         setMobileScaleMessage(null);
         try {
             if (isSupabaseConfigured) {
                 const savedScale = await saveRemoteMobileUiScale(nextScale);
                 if (savedScale === undefined) {
-                    setSavedMobileUiScale(nextScale);
-                    setMobileScaleMessage('Preferensi disimpan di browser ini.');
-                } else {
-                    setSavedMobileUiScale(savedScale);
-                    setMobileUiScale(savedScale);
-                    saveMobileUiScale(savedScale);
-                    setMobileScaleMessage('Preferensi disimpan ke akun Supabase ini.');
+                    throw new Error('Supabase tidak mengembalikan hasil penyimpanan.');
                 }
+                saveMobileUiScale(savedScale);
+                setSavedMobileUiScale(savedScale);
+                setMobileUiScale(savedScale);
+                setMobileScaleMessage('Preferensi disimpan ke akun Supabase ini.');
             } else {
+                saveMobileUiScale(nextScale);
                 setSavedMobileUiScale(nextScale);
                 setMobileScaleMessage('Preferensi disimpan di browser ini saja.');
             }
@@ -224,7 +228,7 @@ const UiTextCustomizationPanel: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => updateMobileUiScale(MOBILE_UI_SCALE_DEFAULT)}
-                        disabled={mobileUiScale === MOBILE_UI_SCALE_DEFAULT}
+                        disabled={savingMobileScale || mobileUiScale === MOBILE_UI_SCALE_DEFAULT}
                         className="inline-flex shrink-0 items-center gap-1 rounded border border-brand-border px-2 py-1 text-xs font-medium text-brand-text-secondary hover:bg-brand-bg disabled:cursor-not-allowed disabled:opacity-40"
                     >
                         <RotateCcw className="h-3.5 w-3.5" />
@@ -240,6 +244,7 @@ const UiTextCustomizationPanel: React.FC = () => {
                         max={MOBILE_UI_SCALE_MAX}
                         step={0.05}
                         value={mobileUiScale}
+                        disabled={savingMobileScale}
                         onChange={event => updateMobileUiScale(Number(event.target.value))}
                         className="min-w-0 flex-1 accent-[#5D87FF]"
                     />
@@ -265,6 +270,7 @@ const UiTextCustomizationPanel: React.FC = () => {
                     </button>
                 </div>
                 {mobileScaleError && <p role="alert" className="mt-2 text-xs font-medium text-red-600">Gagal menyimpan ke Supabase: {mobileScaleError}</p>}
+                {mobileScaleLoadError && <p role="alert" className="mt-2 text-xs font-medium text-red-600">Gagal memuat preferensi dari Supabase: {mobileScaleLoadError}</p>}
                 {mobileScaleMessage && <p role="status" className="mt-2 text-xs font-medium text-emerald-700">{mobileScaleMessage}</p>}
             </div>
 

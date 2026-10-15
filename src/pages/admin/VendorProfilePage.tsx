@@ -15,26 +15,90 @@ import {
 import Modal from '../../shared/ui/Modal';
 import { getEmbedVideoUrl } from '../../utils/videoUtils';
 
+const DEFAULT_PORTFOLIO_CATEGORIES = ['Wedding', 'Prewedding', 'Engagement'];
+const CUSTOM_CATEGORY_VALUE = '__custom_category__';
+
+interface PortfolioCategoryFieldProps {
+  categories: string[];
+  value: string;
+  customValue: string;
+  isCustom: boolean;
+  label: string;
+  onValueChange: (value: string) => void;
+  onCustomValueChange: (value: string) => void;
+  onCustomModeChange: (isCustom: boolean) => void;
+}
+
+const PortfolioCategoryField: React.FC<PortfolioCategoryFieldProps> = ({
+  categories, value, customValue, isCustom, label,
+  onValueChange, onCustomValueChange, onCustomModeChange,
+}) => (
+  <div>
+    <label className="block text-sm font-medium text-brand-text-secondary mb-1">{label}</label>
+    <select
+      required
+      value={isCustom ? CUSTOM_CATEGORY_VALUE : value}
+      onChange={event => {
+        if (event.target.value === CUSTOM_CATEGORY_VALUE) {
+          onCustomModeChange(true);
+          onCustomValueChange('');
+        } else {
+          onCustomModeChange(false);
+          onValueChange(event.target.value);
+        }
+      }}
+      className="w-full px-4 py-2 rounded-xl bg-brand-input border border-brand-border focus:ring-2 focus:ring-brand-accent outline-none"
+    >
+      <option value="" disabled>Pilih kategori...</option>
+      {categories.map(category => <option key={category} value={category}>{category}</option>)}
+      <option value={CUSTOM_CATEGORY_VALUE}>Kategori baru...</option>
+    </select>
+    {isCustom && (
+      <input
+        type="text"
+        required
+        value={customValue}
+        onChange={event => onCustomValueChange(event.target.value)}
+        className="mt-2 w-full px-4 py-2 rounded-xl bg-brand-input border border-brand-border focus:ring-2 focus:ring-brand-accent outline-none"
+        placeholder="Ketik kategori baru..."
+      />
+    )}
+  </div>
+);
+
 // ─── Edit Portfolio Modal ─────────────────────────────────────────────────────
 interface EditPortfolioModalProps {
   portfolio: VendorPortfolio;
+  categoryOptions: string[];
   onClose: () => void;
   onUpdated: (updated: VendorPortfolio) => void;
 }
 
-const EditPortfolioModal: React.FC<EditPortfolioModalProps> = ({ portfolio, onClose, onUpdated }) => {
+const EditPortfolioModal: React.FC<EditPortfolioModalProps> = ({ portfolio, categoryOptions, onClose, onUpdated }) => {
   const [title, setTitle] = useState(portfolio.title);
   const [category, setCategory] = useState(portfolio.category);
+  const [customCategory, setCustomCategory] = useState('');
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [youtubeUrl, setYoutubeUrl] = useState(portfolio.youtube_url || '');
   const [images, setImages] = useState<PortfolioImage[]>(portfolio.images || []);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const availableCategories = Array.from(new Set([
+    ...DEFAULT_PORTFOLIO_CATEGORIES,
+    ...categoryOptions,
+    portfolio.category,
+  ].map(option => option.trim()).filter(Boolean)));
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setSaving(true);
-      const updated = await updateVendorPortfolio(portfolio.id, { title, category, images, youtube_url: youtubeUrl });
+      const updated = await updateVendorPortfolio(portfolio.id, {
+        title,
+        category: (isCustomCategory ? customCategory : category).trim(),
+        images,
+        youtube_url: youtubeUrl,
+      });
       onUpdated(updated);
       onClose();
     } catch {
@@ -77,14 +141,16 @@ const EditPortfolioModal: React.FC<EditPortfolioModalProps> = ({ portfolio, onCl
               placeholder="Contoh: Budi & Sinta Wedding"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-brand-text-secondary mb-1">Kategori</label>
-            <input
-              type="text" required value={category} onChange={e => setCategory(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl bg-brand-input border border-brand-border focus:ring-2 focus:ring-brand-accent outline-none"
-              placeholder="Contoh: Prewedding, Wedding..."
-            />
-          </div>
+          <PortfolioCategoryField
+            categories={availableCategories}
+            value={category}
+            customValue={customCategory}
+            isCustom={isCustomCategory}
+            label="Kategori"
+            onValueChange={setCategory}
+            onCustomValueChange={setCustomCategory}
+            onCustomModeChange={setIsCustomCategory}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-brand-text-secondary mb-1">Link Video YouTube (Opsional)</label>
@@ -160,6 +226,10 @@ const VendorProfilePage: React.FC = () => {
     faqs: [],
   });
   const [portfolios, setPortfolios] = useState<VendorPortfolio[]>([]);
+  const portfolioCategories = Array.from(new Set([
+    ...DEFAULT_PORTFOLIO_CATEGORIES,
+    ...portfolios.map(portfolio => portfolio.category.trim()),
+  ].filter(Boolean)));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -172,7 +242,7 @@ const VendorProfilePage: React.FC = () => {
   const [newFaq, setNewFaq] = useState({ question: '', answer: '' });
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [newPortfolio, setNewPortfolio] = useState({ title: '', category: '', youtube_url: '' });
+  const [newPortfolio, setNewPortfolio] = useState({ title: '', category: '', customCategory: '', isCustomCategory: false, youtube_url: '' });
   const [newPortfolioImages, setNewPortfolioImages] = useState<{ file: File; previewUrl: string }[]>([]);
   const [isCreatingPortfolio, setIsCreatingPortfolio] = useState(false);
   const [isUploadingNewPortfolioImages, setIsUploadingNewPortfolioImages] = useState(false);
@@ -367,13 +437,14 @@ const VendorProfilePage: React.FC = () => {
 
   const handleCreatePortfolio = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPortfolio.title.trim() || !newPortfolio.category.trim()) return;
+    const category = (newPortfolio.isCustomCategory ? newPortfolio.customCategory : newPortfolio.category).trim();
+    if (!newPortfolio.title.trim() || !category) return;
     const selectedFiles = newPortfolioImages.map(image => image.file);
     try {
       setIsCreatingPortfolio(true);
       const created = await createVendorPortfolio({
         title: newPortfolio.title.trim(),
-        category: newPortfolio.category.trim(),
+        category,
         youtube_url: newPortfolio.youtube_url.trim(),
         images: []
       } as any);
@@ -393,14 +464,14 @@ const VendorProfilePage: React.FC = () => {
           ));
         } catch (err: any) {
           closeCreatePortfolioModal();
-          setNewPortfolio({ title: '', category: '', youtube_url: '' });
+          setNewPortfolio({ title: '', category: '', customCategory: '', isCustomCategory: false, youtube_url: '' });
           alert(err?.message || 'Portofolio dibuat, tetapi gagal mengunggah foto. Anda dapat mengunggahnya melalui menu edit portofolio.');
           return;
         }
       }
 
       setIsCreateModalOpen(false);
-      setNewPortfolio({ title: '', category: '', youtube_url: '' });
+      setNewPortfolio({ title: '', category: '', customCategory: '', isCustomCategory: false, youtube_url: '' });
       clearNewPortfolioImages();
     } catch (err: any) {
       alert(err?.message || 'Gagal membuat portofolio');
@@ -1023,12 +1094,16 @@ const VendorProfilePage: React.FC = () => {
               className="w-full px-4 py-2 rounded-xl bg-brand-input border border-brand-border focus:ring-2 focus:ring-brand-accent outline-none"
               placeholder="Contoh: Budi & Sinta Wedding" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-brand-text-secondary mb-1">Kategori / Layanan</label>
-            <input type="text" required value={newPortfolio.category} onChange={e => setNewPortfolio({ ...newPortfolio, category: e.target.value })}
-              className="w-full px-4 py-2 rounded-xl bg-brand-input border border-brand-border focus:ring-2 focus:ring-brand-accent outline-none"
-              placeholder="Contoh: Prewedding / Wedding / Engagement" />
-          </div>
+          <PortfolioCategoryField
+            categories={portfolioCategories}
+            value={newPortfolio.category}
+            customValue={newPortfolio.customCategory}
+            isCustom={newPortfolio.isCustomCategory}
+            label="Kategori / Layanan"
+            onValueChange={category => setNewPortfolio(current => ({ ...current, category }))}
+            onCustomValueChange={customCategory => setNewPortfolio(current => ({ ...current, customCategory }))}
+            onCustomModeChange={isCustomCategory => setNewPortfolio(current => ({ ...current, isCustomCategory }))}
+          />
           <div>
             <label className="block text-sm font-medium text-brand-text-secondary mb-1">Link Video YouTube (Opsional)</label>
             <input type="text" value={newPortfolio.youtube_url} onChange={e => setNewPortfolio({ ...newPortfolio, youtube_url: e.target.value })}
@@ -1115,6 +1190,7 @@ const VendorProfilePage: React.FC = () => {
       {editingPortfolio && (
         <EditPortfolioModal
           portfolio={editingPortfolio}
+          categoryOptions={portfolioCategories}
           onClose={() => setEditingPortfolio(null)}
           onUpdated={(updated) => {
             setPortfolios(portfolios.map(p => p.id === updated.id ? updated : p));

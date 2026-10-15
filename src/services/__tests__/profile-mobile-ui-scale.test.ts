@@ -17,6 +17,7 @@ vi.mock('../../lib/supabaseClient', () => ({
 }));
 
 const MOBILE_UI_SCALE_DEFAULT = 1;
+const queryResult = (data: any): { data: any; error: null } => ({ data, error: null });
 
 describe('Profile mobileUiScale toRow/fromRow round-trip', () => {
   let profileRow: Record<string, any>;
@@ -33,11 +34,11 @@ describe('Profile mobileUiScale toRow/fromRow round-trip', () => {
     fromMock.mockImplementation(() => ({
       select: () => ({
         limit: () => ({
-          maybeSingle: async () => ({ data: profileRow, error: null }),
+          maybeSingle: async () => queryResult(profileRow),
         }),
         eq: () => ({
-          maybeSingle: async () => ({ data: { booking_form_template: null }, error: null }),
-          single: async () => ({ data: profileRow, error: null }),
+          maybeSingle: async () => queryResult({ booking_form_template: null }),
+          single: async () => queryResult(profileRow),
         }),
       }),
       update: (updates: Record<string, any>) => ({
@@ -45,7 +46,7 @@ describe('Profile mobileUiScale toRow/fromRow round-trip', () => {
           select: () => ({
             single: async () => {
               profileRow = { ...profileRow, ...updates };
-              return { data: profileRow, error: null };
+              return queryResult(profileRow);
             },
           }),
         }),
@@ -54,7 +55,7 @@ describe('Profile mobileUiScale toRow/fromRow round-trip', () => {
         select: () => ({
           single: async () => {
             profileRow = { ...values, id: 'profile-new-rt' };
-            return { data: profileRow, error: null };
+            return queryResult(profileRow);
           },
         }),
       }),
@@ -76,15 +77,14 @@ describe('Profile mobileUiScale toRow/fromRow round-trip', () => {
     expect(profile?.mobileUiScale).toBe(0.8);
   });
 
-  it('write mobileUiScale=1.0 stores null in DB, read back yields 1.0 (clean round-trip)', async () => {
+  it('write mobileUiScale=1.0 stores the explicit default and reads it back', async () => {
     profileRow.mobile_ui_scale = 0.8; // start with a non-default value
     const { upsertProfile, getProfile } = await import('../profile');
 
     // Write the default scale
     await upsertProfile({ id: 'profile-rt-1', mobileUiScale: 1.0 });
 
-    // The DB row should have null stored for the default
-    expect(profileRow.mobile_ui_scale).toBeNull();
+    expect(profileRow.mobile_ui_scale).toBe(MOBILE_UI_SCALE_DEFAULT);
 
     // Reading back should yield the default (1.0), not undefined
     const profile = await getProfile();
